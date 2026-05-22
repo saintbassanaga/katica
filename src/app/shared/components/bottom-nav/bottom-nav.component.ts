@@ -9,9 +9,9 @@ import { NavItem } from '@shared/models/model';
 const USER_NAV: NavItem[] = [
   { key: 'home',          route: '/dashboard'     },
   { key: 'escrow',        route: '/escrow'        },
-  { key: 'disputes',      route: '/disputes'      },
-  { key: 'payouts',       route: '/payouts'       },
+  { key: 'wallet',        route: '/wallet'        },
   { key: 'notifications', route: '/notifications' },
+  { key: 'profile',       route: '/profile'       },
 ];
 
 const ADMIN_NAV: NavItem[] = [
@@ -19,6 +19,7 @@ const ADMIN_NAV: NavItem[] = [
   { key: 'adminDisputes', route: '/admin/disputes'  },
   { key: 'adminUsers',    route: '/admin/users'     },
   { key: 'notifications', route: '/notifications'   },
+  { key: 'profile',       route: '/profile'         },
 ];
 
 const STAFF_ROLES = new Set(['ADMIN', 'SUPERVISOR', 'SUPPORT']);
@@ -40,7 +41,7 @@ const STAFF_ROLES = new Set(['ADMIN', 'SUPERVISOR', 'SUPPORT']);
               <tui-icon [icon]="navIcon(item.key)" class="w-5 h-5" />
               @if (item.key === 'notifications' && notifStore.unreadCount() > 0) {
                 <span class="absolute -top-1 -right-1 min-w-[14px] h-[14px] px-0.5 rounded-full bg-primary text-white text-[9px] font-bold flex items-center justify-center leading-none">
-                  {{ notifStore.unreadCount() > 9 ? '9+' : notifStore.unreadCount() }}
+                  {{ notifStore.unreadCount() > 99 ? '99+' : notifStore.unreadCount() }}
                 </span>
               }
             </div>
@@ -67,6 +68,7 @@ export class BottomNavComponent implements OnInit {
     const map: Record<string, string> = {
       home:          '@tui.home',
       escrow:        '@tui.arrow-up-down',
+      wallet:        '@tui.wallet',
       disputes:      '@tui.triangle-alert',
       payouts:       '@tui.circle-arrow-up',
       profile:       '@tui.user',

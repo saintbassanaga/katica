@@ -10,7 +10,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ReasonGroup } from '@shared/models/model';
 import { AuthStore } from '@core/auth/auth.store';
 import { AmountPipe } from '@shared/pipes/amount.pipe';
-import { TransactionDetail } from '@app/models';
+import { TransactionDetail } from '@shared/models/model';
 import { TuiIcon } from '@taiga-ui/core';
 
 const MAX_FILES      = 5;

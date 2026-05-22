@@ -163,6 +163,33 @@ export interface StompMessage<T = unknown> {
 
 // ── Escrow / Transactions ─────────────────────────────────────
 
+export type TransactionMode = 'STANDARD' | 'FREELANCE';
+
+export type MilestoneStatus = 'PENDING' | 'LOCKED' | 'DELIVERED' | 'RELEASED' | 'CANCELLED';
+
+export interface Milestone {
+  id: string;
+  position: number;
+  title: string;
+  description: string | null;
+  amount: number;
+  netAmount: number;
+  platformFeeAmount: number;
+  status: MilestoneStatus;
+  deadline: string | null;
+  lockedAt: string | null;
+  deliveredAt: string | null;
+  releasedAt: string | null;
+  createdAt: string;
+}
+
+export interface MilestoneCreateRequest {
+  title: string;
+  description?: string;
+  amount: number;
+  deadline?: string; // ISO 8601
+}
+
 export interface TransactionSummary {
   id: string;
   reference: string;
@@ -174,6 +201,7 @@ export interface TransactionSummary {
   platformFee: number | null;
   netAmount: number | null;
   currency: string;
+  transactionMode: TransactionMode;
   status: string;
   createdAt: string;
   lockedAt: string | null;
@@ -195,6 +223,7 @@ export interface TransactionDetail {
   platformFee: number | null;
   netAmount: number | null;
   currency: string;
+  transactionMode: TransactionMode;
   status: string;
   activeDisputeId: string | null;
   createdAt: string;
@@ -204,6 +233,7 @@ export interface TransactionDetail {
   releasedAt: string | null;
   disputedAt: string | null;
   refundedAt: string | null;
+  milestones: Milestone[];
 }
 
 export interface EscrowCreateRequest {
@@ -212,6 +242,8 @@ export interface EscrowCreateRequest {
   description?: string;
   deliveryDeadline?: string; // ISO 8601
   idempotencyKey?: string;
+  mode?: TransactionMode;
+  milestones?: MilestoneCreateRequest[];
 }
 
 export interface Page<T> {
@@ -369,7 +401,8 @@ export type MovementType =
   | 'DISPUTE_FREEZE' | 'DISPUTE_REFUND_BUYER' | 'DISPUTE_RELEASE_SELLER'
   | 'DISPUTE_SPLIT_BUYER' | 'DISPUTE_SPLIT_SELLER'
   | 'PAYOUT_DEBIT' | 'PAYOUT_REVERSAL' | 'PAYOUT_FAILED_REFUND'
-  | 'DEPOSIT_CREDIT' | 'PLATFORM_FEE_CREDIT';
+  | 'DEPOSIT_CREDIT' | 'PLATFORM_FEE_CREDIT'
+  | 'MILESTONE_CREDIT' | 'MILESTONE_FEE_CREDIT';
 
 export interface WalletBalance {
   id: string;

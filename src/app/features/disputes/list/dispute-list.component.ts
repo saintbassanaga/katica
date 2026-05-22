@@ -112,6 +112,13 @@ const RESOLVED_STATUSES = new Set([
                 </div>
               </a>
             }
+
+            @if (hasMore()) {
+              <button
+                class="w-full py-3.5 border-[1.5px] border-dashed border-slate-200 rounded-xl text-slate-400 text-sm bg-transparent cursor-pointer font-[inherit] transition-colors hover:border-primary hover:text-primary disabled:opacity-50"
+                (click)="loadMore()" [disabled]="loadingMore()"
+              >{{ loadingMore() ? ('common.loading' | translate) : ('common.loadMore' | translate) }}</button>
+            }
           </div>
         }
 
@@ -124,8 +131,11 @@ export class DisputeListComponent implements OnInit {
 
   protected readonly disputes     = signal<DisputeResponse[]>([]);
   protected readonly loading      = signal(true);
+  protected readonly loadingMore  = signal(false);
+  protected readonly hasMore      = signal(false);
   protected readonly activeFilter = signal<string>('ALL');
   protected readonly filters      = FILTERS;
+  private page = 0;
 
   protected readonly filtered = computed(() => {
     const f = this.activeFilter();
@@ -136,6 +146,24 @@ export class DisputeListComponent implements OnInit {
   });
 
   protected setFilter(value: string): void { this.activeFilter.set(value); }
+
+  protected loadMore(): void {
+    this.page++;
+    this.loadingMore.set(true);
+    this.fetch();
+  }
+
+  private fetch(): void {
+    this.disputeService.getDisputes({ page: this.page, size: 20 }).subscribe({
+      next: (data) => {
+        this.disputes.update(d => this.page === 0 ? data.content : [...d, ...data.content]);
+        this.hasMore.set(this.page < data.totalPages - 1);
+        this.loading.set(false);
+        this.loadingMore.set(false);
+      },
+      error: () => { this.loading.set(false); this.loadingMore.set(false); },
+    });
+  }
 
   protected statusBorderClass(status: string): string {
     const map: Record<string, string> = {
@@ -202,9 +230,6 @@ export class DisputeListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.disputeService.getDisputes({ page: 0, size: 50 }).subscribe({
-      next: (data) => { this.disputes.set(data.content); this.loading.set(false); },
-      error: () => this.loading.set(false),
-    });
+    this.fetch();
   }
 }

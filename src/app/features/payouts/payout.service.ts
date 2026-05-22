@@ -23,7 +23,7 @@ export class PayoutService extends ApiService {
     return this.http.post<PayoutRequestResponse>(this.url(`/api/payouts/${payoutId}/otp/resend`), {}, this.defaultOptions);
   }
 
-  getBalance(): Observable<{ balance: number; frozenAmount: number }> {
-    return this.http.get<{ balance: number; frozenAmount: number }>(this.url('/api/wallet'), this.defaultOptions);
+  getBalance(): Observable<{ balance: number; frozenAmount: number; currency: string }> {
+    return this.http.get<{ balance: number; frozenAmount: number; currency: string }>(this.url('/api/wallet'), this.defaultOptions);
   }
 }

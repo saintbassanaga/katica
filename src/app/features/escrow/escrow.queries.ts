@@ -118,3 +118,29 @@ export function injectCancelEscrowMutation() {
     },
   }));
 }
+
+export function injectDeliverMilestoneMutation() {
+  const service = inject(EscrowService);
+  const queryClient = inject(QueryClient);
+  return injectMutation(() => ({
+    mutationFn: ({ txId, milestoneId }: { txId: string; milestoneId: string }) =>
+      firstValueFrom(service.deliverMilestone(txId, milestoneId)),
+    onSuccess: (_, { txId }) => {
+      queryClient.invalidateQueries({ queryKey: escrowKeys.detail(txId) });
+      queryClient.invalidateQueries({ queryKey: escrowKeys.lists() });
+    },
+  }));
+}
+
+export function injectReleaseMilestoneMutation() {
+  const service = inject(EscrowService);
+  const queryClient = inject(QueryClient);
+  return injectMutation(() => ({
+    mutationFn: ({ txId, milestoneId }: { txId: string; milestoneId: string }) =>
+      firstValueFrom(service.releaseMilestone(txId, milestoneId)),
+    onSuccess: (_, { txId }) => {
+      queryClient.invalidateQueries({ queryKey: escrowKeys.detail(txId) });
+      queryClient.invalidateQueries({ queryKey: escrowKeys.lists() });
+    },
+  }));
+}

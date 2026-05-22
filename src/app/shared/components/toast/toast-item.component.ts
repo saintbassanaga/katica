@@ -1,7 +1,7 @@
 import { Component, input, output } from '@angular/core';
 import { TuiIcon } from '@taiga-ui/core';
 import { TranslatePipe } from '@ngx-translate/core';
-import { Toast } from '@app/models';
+import { Toast } from '@shared/models/model';
 
 const TOAST_STYLES: Record<string, string> = {
   success: 'bg-green-50 border-green-500 text-green-800',

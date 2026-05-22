@@ -100,7 +100,7 @@ import {
     @if (isBrowser) {
 
       <!-- ══ Header ══ -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div class="flex items-center justify-between mb-4">
         <div>
           <p class="section-eyebrow" style="margin-bottom:2px">Platform Intelligence</p>
           <h2 style="font-size:14px;font-weight:900;color:#0F172A;margin:0;letter-spacing:-.02em">Analytics</h2>
@@ -115,7 +115,7 @@ import {
       </div>
 
       <!-- ══ ROW 1 — Volume Hero ══ -->
-      <div class="chart-card" style="margin-bottom:16px">
+      <div class="chart-card mb-4">
         <div class="chart-card-header">
           <div>
             <p class="chart-card-title">Released Volume</p>
@@ -140,7 +140,7 @@ import {
       </div>
 
       <!-- ══ ROW 2 — Dispute + Transaction ══ -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px" class="max-md:grid-cols-1">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
 
         <!-- Dispute Trend -->
         <div class="chart-card">
@@ -194,7 +194,7 @@ import {
       </div>
 
       <!-- ══ ROW 3 — Revenue + Users ══ -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px" class="max-md:grid-cols-1">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
 
         <!-- Platform Revenue -->
         <div class="chart-card">
@@ -248,7 +248,7 @@ import {
       </div>
 
       <!-- ══ ROW 4 — Dispute Rate + Payouts ══ -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px" class="max-md:grid-cols-1">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
 
         <!-- Dispute Rate -->
         <div class="chart-card">
@@ -305,7 +305,7 @@ import {
 
       <!-- ══ ROW 5 — Snapshot Donuts ══ -->
       <p class="section-eyebrow">Current Snapshot</p>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px" class="max-md:grid-cols-1">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
         <!-- Dispute Status Donut -->
         <div class="chart-card">

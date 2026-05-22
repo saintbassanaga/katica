@@ -2,6 +2,6 @@ export const environment = {
   production: false,
 
   apiUrl: '',
-  wsUrl: 'http://localhost:8080/ws',
+  wsUrl: 'https://api.katica.app:8080/ws',
   debug: true,
 };

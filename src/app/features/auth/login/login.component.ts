@@ -96,12 +96,12 @@ import { TuiIcon } from '@taiga-ui/core';
     }
 
     .brand-name {
-      font-family: 'Cormorant Garamond', 'Times New Roman', serif;
+      font-family: 'Outfit Variable', -apple-system, BlinkMacSystemFont, sans-serif;
       font-size: 3.25rem;
-      font-weight: 700;
+      font-weight: 800;
       color: #fff;
       margin: 0.5rem 0 0;
-      letter-spacing: 0.01em;
+      letter-spacing: -0.02em;
       line-height: 1;
     }
 
@@ -309,7 +309,7 @@ import { TuiIcon } from '@taiga-ui/core';
       }
 
       .brand-sep { margin: 0.625rem 0 0.5rem; }
-      .brand-name { font-size: 4.5rem; }
+      .brand-name { font-size: 4.25rem; }
       .brand-features { display: flex; }
       .brand-circles { display: block; }
       .split-divider { display: block; }

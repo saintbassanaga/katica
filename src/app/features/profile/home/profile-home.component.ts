@@ -62,7 +62,7 @@ import { MenuItem } from '@shared/models/model';
         <div class="w-14 h-14 rounded-full shrink-0 bg-gradient-to-br from-primary to-primary-dk flex items-center justify-center text-white text-xl font-bold shadow-[0_4px_16px_rgba(27,79,138,.3)]">{{ auth.initials() }}</div>
         <div class="flex-1 min-w-0">
           <p class="text-base font-bold text-slate-900 m-0 mb-1 truncate">{{ auth.fullName() }}</p>
-          <span class="inline-block text-[.6875rem] font-bold uppercase tracking-[.07em] text-[#92680A] bg-gold-lt px-3 py-[.2rem] rounded-full border border-[rgba(201,146,13,.2)]">{{ auth.role() }}</span>
+          <span class="inline-block text-[.6875rem] font-bold uppercase tracking-[.07em] text-[#92680A] bg-gold-lt px-3 py-[.2rem] rounded-full border border-[rgba(201,146,13,.2)]">{{ 'roles.' + auth.role() | translate }}</span>
         </div>
         <a routerLink="/profile/edit" class="shrink-0 px-4 py-2 rounded-[10px] bg-gradient-to-br from-primary to-primary-dk text-white text-[.8125rem] font-bold no-underline flex items-center gap-1.5 shadow-[0_2px_8px_rgba(27,79,138,.3)] transition-all hover:opacity-90 hover:-translate-y-px" [attr.aria-label]="'profile.edit' | translate">
           <tui-icon icon="@tui.pencil" class="w-[13px] h-[13px]" />

@@ -256,7 +256,25 @@
         "openDispute": "Open a dispute",
         "viewDispute": "View ongoing dispute",
         "confirmReception": "Confirm & release payment"
+      },
+      "milestones": {
+        "title": "Milestones",
+        "deadline": "Due",
+        "status": {
+          "PENDING": "Pending",
+          "LOCKED": "In progress",
+          "DELIVERED": "Awaiting review",
+          "RELEASED": "Paid",
+          "CANCELLED": "Cancelled"
+        },
+        "actions": {
+          "deliver": "Submit work",
+          "release": "Release {{amount}}"
+        }
       }
+    },
+    "list": {
+      "freelanceBadge": "Freelance"
     }
   },
   "disputes": {
@@ -621,7 +639,7 @@
     "form": {
       "title": "New transaction",
       "buyerPhone": "Buyer phone",
-      "amount": "Amount",
+      "amount": "Total amount",
       "description": "Description",
       "descriptionPh": "Transaction purpose…",
       "deadline": "Delivery deadline",
@@ -635,7 +653,23 @@
       "amountMin": "Minimum 25 XAF",
       "amountMax": "Maximum 10,000,000 XAF",
       "maxChars": "Max. 500 characters",
-      "deadlineHint": "The buyer must confirm receipt before this date."
+      "deadlineHint": "The buyer must confirm receipt before this date.",
+      "mode": {
+        "label": "Transaction type",
+        "standard": "Standard",
+        "freelance": "Freelance",
+        "standardHint": "One payment released at the end after buyer confirms receipt.",
+        "freelanceHint": "Split into milestones — funds released progressively as work is delivered."
+      },
+      "milestone": {
+        "label": "Milestones",
+        "titlePh": "Milestone title",
+        "deadlinePh": "Deadline (optional)",
+        "add": "Add milestone",
+        "remove": "Remove milestone",
+        "sum": "Milestones total",
+        "sumError": "Milestone amounts must equal the total amount."
+      }
     }
   },
   "toast": {
@@ -646,7 +680,8 @@
     "passwordChanged": "Password changed successfully.",
     "mfaDisabled": "Two-factor authentication disabled.",
     "invalidCode": "Invalid code. Please try again.",
-    "verificationSent": "Verification request sent."
+    "verificationSent": "Verification request sent.",
+    "registerSuccess": "Account created successfully."
   },
   "admin": {
     "title": "Administration",

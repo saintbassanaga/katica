@@ -59,10 +59,18 @@ const FILTERS = [
             >
               <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0"
                    style="background: var(--clr-primary-lt); color: var(--clr-primary)">
-                {{ tx.buyerName[0] }}
+                {{ (tx.buyerName || '?')[0].toUpperCase() }}
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-sm font-semibold text-gray-900">{{ tx.reference }}</p>
+                <div class="flex items-center gap-1.5">
+                  <p class="text-sm font-semibold text-gray-900">{{ tx.reference }}</p>
+                  @if (tx.transactionMode === 'FREELANCE') {
+                    <span class="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide"
+                          style="background: var(--clr-primary-lt); color: var(--clr-primary)">
+                      {{ 'escrow.list.freelanceBadge' | translate }}
+                    </span>
+                  }
+                </div>
                 <p class="text-xs text-gray-500 truncate">{{ tx.buyerName }}</p>
                 <p class="text-xs text-gray-400">{{ tx.createdAt | timeAgo }}</p>
               </div>

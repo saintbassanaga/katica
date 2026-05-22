@@ -3,12 +3,13 @@ import { Observable } from 'rxjs';
 import { ApiService } from '@core/http/api.service';
 import {
   EscrowCreateRequest,
+  Milestone,
   Page,
   TransactionDetail,
   TransactionSummary,
 } from '@shared/models/model';
 
-export type { EscrowCreateRequest, Page, TransactionDetail, TransactionSummary };
+export type { EscrowCreateRequest, Milestone, Page, TransactionDetail, TransactionSummary };
 
 @Injectable({ providedIn: 'root' })
 export class EscrowService extends ApiService {
@@ -71,6 +72,18 @@ export class EscrowService extends ApiService {
   cancel(id: string): Observable<TransactionDetail> {
     return this.http.post<TransactionDetail>(
       this.url(`/api/escrow/${id}/cancel`), {}, this.defaultOptions,
+    );
+  }
+
+  deliverMilestone(txId: string, milestoneId: string): Observable<Milestone> {
+    return this.http.post<Milestone>(
+      this.url(`/api/escrow/${txId}/milestones/${milestoneId}/deliver`), {}, this.defaultOptions,
+    );
+  }
+
+  releaseMilestone(txId: string, milestoneId: string): Observable<Milestone> {
+    return this.http.post<Milestone>(
+      this.url(`/api/escrow/${txId}/milestones/${milestoneId}/release`), {}, this.defaultOptions,
     );
   }
 }

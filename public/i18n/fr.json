@@ -256,7 +256,25 @@
         "openDispute": "Ouvrir un litige",
         "viewDispute": "Voir le litige en cours",
         "confirmReception": "Confirmer et libérer le paiement"
+      },
+      "milestones": {
+        "title": "Jalons",
+        "deadline": "Échéance",
+        "status": {
+          "PENDING": "En attente",
+          "LOCKED": "En cours",
+          "DELIVERED": "En révision",
+          "RELEASED": "Payé",
+          "CANCELLED": "Annulé"
+        },
+        "actions": {
+          "deliver": "Soumettre le travail",
+          "release": "Libérer {{amount}}"
+        }
       }
+    },
+    "list": {
+      "freelanceBadge": "Freelance"
     }
   },
   "disputes": {
@@ -621,7 +639,7 @@
     "form": {
       "title": "Nouvelle transaction",
       "buyerPhone": "Téléphone de l'acheteur",
-      "amount": "Montant",
+      "amount": "Montant total",
       "description": "Description",
       "descriptionPh": "Objet de la transaction…",
       "deadline": "Date limite de livraison",
@@ -635,7 +653,23 @@
       "amountMin": "Minimum 100 XAF",
       "amountMax": "Maximum 10 000 000 XAF",
       "maxChars": "Max. 500 caractères",
-      "deadlineHint": "L'acheteur devra confirmer la réception avant cette date."
+      "deadlineHint": "L'acheteur devra confirmer la réception avant cette date.",
+      "mode": {
+        "label": "Type de transaction",
+        "standard": "Standard",
+        "freelance": "Freelance",
+        "standardHint": "Un seul paiement libéré à la fin après confirmation de réception.",
+        "freelanceHint": "Divisé en jalons — les fonds sont libérés progressivement à chaque livraison."
+      },
+      "milestone": {
+        "label": "Jalons",
+        "titlePh": "Titre du jalon",
+        "deadlinePh": "Échéance (optionnel)",
+        "add": "Ajouter un jalon",
+        "remove": "Supprimer le jalon",
+        "sum": "Total jalons",
+        "sumError": "La somme des jalons doit être égale au montant total."
+      }
     }
   },
   "toast": {
@@ -646,7 +680,8 @@
     "passwordChanged": "Mot de passe modifié avec succès.",
     "mfaDisabled": "Double authentification désactivée.",
     "invalidCode": "Code invalide. Réessayez.",
-    "verificationSent": "Demande de vérification envoyée."
+    "verificationSent": "Demande de vérification envoyée.",
+    "registerSuccess": "Compte créé avec succès !"
   },
   "admin": {
     "title": "Administration",

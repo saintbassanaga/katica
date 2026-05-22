@@ -1,5 +1,6 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { DatePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { AmountPipe } from '@shared/pipes/amount.pipe';
@@ -44,12 +45,14 @@ const TYPE_ICONS: Record<MovementType, string> = {
   PAYOUT_FAILED_REFUND:   '@tui.rotate-cw',
   DEPOSIT_CREDIT:         '@tui.download',
   PLATFORM_FEE_CREDIT:    '@tui.coins',
+  MILESTONE_CREDIT:       '@tui.milestone',
+  MILESTONE_FEE_CREDIT:   '@tui.coins',
 };
 
 @Component({
   selector: 'app-wallet',
   standalone: true,
-  imports: [RouterLink, AmountPipe, TimeAgoPipe, BottomSheetComponent, TranslatePipe, TuiIcon],
+  imports: [RouterLink, DatePipe, AmountPipe, TimeAgoPipe, BottomSheetComponent, TranslatePipe, TuiIcon],
   styles: [':host { display: block; }'],
   template: `
     <div class="animate-fade">
@@ -64,7 +67,7 @@ const TYPE_ICONS: Record<MovementType, string> = {
         @if (balanceVisible()) {
           <div class="text-[clamp(2rem,8vw,3rem)] font-extrabold tracking-[-0.04em] leading-none text-white">{{ wallet()?.balance | amount }}</div>
         } @else {
-          <div class="text-[clamp(2rem,8vw,3rem)] font-extrabold tracking-[.08em] leading-none text-white/18">••••••</div>
+          <div class="text-[clamp(2rem,8vw,3rem)] font-extrabold tracking-[.08em] leading-none text-white/45">••••••</div>
         }
         <button class="shrink-0 w-9 h-9 rounded-[10px] bg-white/[.07] border border-white/10 text-white/45 cursor-pointer flex items-center justify-center mt-1 transition-colors hover:bg-white/12 hover:text-white/75" (click)="balanceVisible.set(!balanceVisible())">
           <tui-icon [icon]="balanceVisible() ? '@tui.eye-off' : '@tui.eye'" class="w-4 h-4" />
@@ -140,7 +143,7 @@ const TYPE_ICONS: Record<MovementType, string> = {
 
               <div class="flex-1 min-w-0">
                 <p class="text-sm font-semibold text-slate-800 whitespace-nowrap overflow-hidden text-ellipsis m-0">{{ mov.description }}</p>
-                <p class="text-[.6875rem] text-slate-400 mt-0.5 m-0">{{ mov.relatedTransactionId ?? '—' }} · {{ mov.createdAt | timeAgo }}</p>
+                <p class="text-[.6875rem] text-slate-400 mt-0.5 m-0">{{ mov.relatedTransactionId ?? '—' }} · {{ mov.createdAt | date:'dd/MM/yy' }} · {{ mov.createdAt | timeAgo }}</p>
               </div>
 
               <p class="text-[.9375rem] font-extrabold shrink-0 tracking-[-0.01em] m-0"
@@ -281,7 +284,7 @@ export class WalletComponent implements OnInit {
   }
 
   protected isCredit(mov: WalletMovement): boolean {
-    return +mov.balanceAfter >= +mov.balanceBefore;
+    return +mov.balanceAfter > +mov.balanceBefore;
   }
 
   protected typeIcon(movementType: MovementType): string {

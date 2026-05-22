@@ -596,7 +596,7 @@ import { DashboardTransactionSummary, DisputeSummary, WalletInfo } from '@shared
                 </svg>
               </div>
               <span
-                class="text-[.625rem] font-semibold px-1.5 py-0.5 rounded-full bg-success-lt text-success whitespace-nowrap">{{ 'dashboard.kpi.pending' | translate }}</span>
+                class="text-[.625rem] font-semibold px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 whitespace-nowrap">{{ 'dashboard.kpi.pending' | translate }}</span>
             </div>
             <div class="text-[.75rem] text-slate-500 font-medium mb-1">{{ 'dashboard.kpi.toReceive' | translate }}</div>
             <div
@@ -610,7 +610,7 @@ import { DashboardTransactionSummary, DisputeSummary, WalletInfo } from '@shared
 
         <!-- Transactions -->
         <div class="flex items-center justify-between mb-3">
-          <span class="text-base font-bold text-slate-500">{{ 'dashboard.recentTransactions' | translate }}</span>
+          <span class="text-base font-bold text-slate-800">{{ 'dashboard.recentTransactions' | translate }}</span>
           <a routerLink="/escrow"
              class="text-[.8125rem] font-semibold text-primary no-underline">{{ 'dashboard.viewAll' | translate }}</a>
         </div>
@@ -766,7 +766,7 @@ import { DashboardTransactionSummary, DisputeSummary, WalletInfo } from '@shared
                   <polyline points="12 6 12 12 16 14"/>
                 </svg>
               </div>
-              <span class="d-kpi-trend d-kpi-trend--up">{{ 'dashboard.kpi.pending' | translate }}</span>
+              <span class="d-kpi-trend d-kpi-trend--warn">{{ 'dashboard.kpi.pending' | translate }}</span>
             </div>
             <div class="d-kpi-label">{{ 'dashboard.kpi.amountToReceive' | translate }}</div>
             <div class="d-kpi-value">{{ pendingAmount() | amount }}</div>

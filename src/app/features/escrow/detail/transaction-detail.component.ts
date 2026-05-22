@@ -11,14 +11,16 @@ import { AmountPipe } from '@shared/pipes/amount.pipe';
 import { StatusBadgeComponent } from '@shared/components/status-badge/status-badge.component';
 import { LoadingSkeletonComponent } from '@shared/components/loading-skeleton/loading-skeleton.component';
 import { StompSubscription } from '@stomp/stompjs';
-import { TransactionDetail } from '@app/models';
+import { Milestone, TransactionDetail } from '@shared/models/model';
 import {
   escrowKeys,
   injectAcceptEscrowMutation,
   injectCancelEscrowMutation,
   injectDeliverEscrowMutation,
+  injectDeliverMilestoneMutation,
   injectEscrowDetailQuery,
   injectReleaseEscrowMutation,
+  injectReleaseMilestoneMutation,
   injectShipEscrowMutation,
 } from '../escrow.queries';
 
@@ -34,7 +36,6 @@ const STATUS_TIMESTAMP: Partial<Record<string, keyof TransactionDetail>> = {
   SHIPPED:   'shippedAt',
   DELIVERED: 'deliveredAt',
   RELEASED:  'releasedAt',
-  CANCELLED: 'releasedAt',
 };
 
 // Visual steps shown in the timeline (INITIATED is transient — no dedicated timestamp)
@@ -63,11 +64,6 @@ const STATUS_ORDER: Record<string, number> = {
 
       @if (query.isPending()) {
         <app-loading-skeleton></app-loading-skeleton>
-        <div class="animate-pulse space-y-4">
-          <div class="h-8 bg-gray-200 rounded w-1/2"></div>
-          <div class="h-32 bg-gray-200 rounded-2xl"></div>
-          <div class="h-24 bg-gray-200 rounded-2xl"></div>
-        </div>
       } @else if (query.data(); as tx) {
         <div class="space-y-4">
 
@@ -76,7 +72,7 @@ const STATUS_ORDER: Record<string, number> = {
             <div>
               <h1 class="text-lg font-bold" style="color: var(--clr-text)">{{ tx.reference }}</h1>
               <p class="text-sm mt-0.5" style="color: var(--clr-muted)">
-                {{ tx.createdAt | date:'dd/MM/yyyy à HH:mm' }}
+                {{ tx.createdAt | date:'dd/MM/yyyy · HH:mm' }}
               </p>
               @if (isBuyer(tx)) {
                 <p class="text-sm font-medium mt-1.5 flex items-center gap-1" style="color: var(--clr-primary)">
@@ -99,39 +95,129 @@ const STATUS_ORDER: Record<string, number> = {
             </div>
           </div>
 
-          <!-- Status timeline -->
-          <div class="animate-entry bg-white rounded-2xl p-4 shadow-sm">
-            <h2 class="text-sm font-semibold mb-3" style="color: var(--clr-muted)">
-              {{ 'escrow.detail.progress' | translate }}
-            </h2>
-            <div class="flex items-end">
-              @for (step of statusSteps; track step; let i = $index; let last = $last) {
-                <div class="flex-1 min-w-0 flex flex-col items-center">
-                  <div
-                    class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold border-2 shrink-0"
-                    [style.background]="isStepDone(step, tx) ? 'var(--clr-primary)' : 'transparent'"
-                    [style.border-color]="isStepDone(step, tx) ? 'var(--clr-primary)' : 'var(--clr-border)'"
-                    [style.color]="isStepDone(step, tx) ? '#fff' : 'var(--clr-muted)'"
-                  >
-                    @if (isStepDone(step, tx)) { <tui-icon icon="@tui.check" class="w-3 h-3" /> } @else { {{ i + 1 }} }
-                  </div>
-                  <p class="text-[10px] mt-1 text-center w-full px-0.5 leading-tight" style="color: var(--clr-muted)">
-                    {{ 'escrow.detail.steps.' + step | translate }}
-                  </p>
-                  @if (stepTimestamp(step, tx)) {
-                    <p class="text-[9px] text-center w-full px-0.5 leading-tight" style="color: #94A3B8">
-                      {{ stepTimestamp(step, tx) | date:'dd/MM HH:mm' }}
+          <!-- Status timeline — STANDARD mode -->
+          @if (tx.transactionMode !== 'FREELANCE') {
+            <div class="animate-entry bg-white rounded-2xl p-4 shadow-sm">
+              <h2 class="text-sm font-semibold mb-3" style="color: var(--clr-muted)">
+                {{ 'escrow.detail.progress' | translate }}
+              </h2>
+              <div class="flex items-end">
+                @for (step of statusSteps; track step; let i = $index; let last = $last) {
+                  <div class="flex-1 min-w-0 flex flex-col items-center">
+                    <div
+                      class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold border-2 shrink-0"
+                      [style.background]="isStepDone(step, tx) ? 'var(--clr-primary)' : 'transparent'"
+                      [style.border-color]="isStepDone(step, tx) ? 'var(--clr-primary)' : 'var(--clr-border)'"
+                      [style.color]="isStepDone(step, tx) ? '#fff' : 'var(--clr-muted)'"
+                    >
+                      @if (isStepDone(step, tx)) { <tui-icon icon="@tui.check" class="w-3 h-3" /> } @else { {{ i + 1 }} }
+                    </div>
+                    <p class="text-[10px] mt-1 text-center w-full px-0.5 leading-tight" style="color: var(--clr-muted)">
+                      {{ 'escrow.detail.steps.' + step | translate }}
                     </p>
+                    @if (stepTimestamp(step, tx)) {
+                      <p class="text-[9px] text-center w-full px-0.5 leading-tight" style="color: #94A3B8">
+                        {{ stepTimestamp(step, tx) | date:'dd/MM HH:mm' }}
+                      </p>
+                    }
+                  </div>
+                  @if (!last) {
+                    <div class="w-3 shrink-0 h-0.5 mb-8"
+                         [style.background]="isStepDone(step, tx) ? 'var(--clr-primary)' : 'var(--clr-border)'">
+                    </div>
                   }
-                </div>
-                @if (!last) {
-                  <div class="w-3 shrink-0 h-0.5 mb-8"
-                       [style.background]="isStepDone(step, tx) ? 'var(--clr-primary)' : 'var(--clr-border)'">
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Milestones — FREELANCE mode -->
+          @if (tx.transactionMode === 'FREELANCE' && tx.milestones.length) {
+            <div class="animate-entry bg-white rounded-2xl p-4 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <h2 class="text-sm font-semibold m-0" style="color: var(--clr-muted)">
+                  {{ 'escrow.detail.milestones.title' | translate }}
+                </h2>
+                <span class="text-xs font-semibold px-2 py-0.5 rounded-full" style="background: var(--clr-primary-lt); color: var(--clr-primary)">
+                  {{ releasedCount(tx) }}/{{ tx.milestones.length }}
+                </span>
+              </div>
+
+              <div class="flex flex-col gap-2">
+                @for (m of tx.milestones; track m.id) {
+                  <div class="rounded-xl border p-3"
+                       [style.border-color]="milestoneColor(m.status).border"
+                       [style.background]="milestoneColor(m.status).bg">
+                    <div class="flex items-center gap-3">
+                      <!-- Status dot -->
+                      <div class="w-8 h-8 rounded-[10px] shrink-0 flex items-center justify-center text-white text-xs font-bold"
+                           [style.background]="milestoneColor(m.status).icon">
+                        @if (m.status === 'RELEASED') {
+                          <tui-icon icon="@tui.check" class="w-3.5 h-3.5" />
+                        } @else if (m.status === 'DELIVERED') {
+                          <tui-icon icon="@tui.clock" class="w-3.5 h-3.5" />
+                        } @else if (m.status === 'LOCKED') {
+                          <tui-icon icon="@tui.lock-open" class="w-3.5 h-3.5" />
+                        } @else if (m.status === 'CANCELLED') {
+                          <tui-icon icon="@tui.x" class="w-3.5 h-3.5" />
+                        } @else {
+                          <span class="text-[10px]">{{ m.position }}</span>
+                        }
+                      </div>
+
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold m-0 truncate" style="color: var(--clr-text)">{{ m.title }}</p>
+                        <p class="text-xs m-0 mt-0.5" style="color: var(--clr-muted)">
+                          {{ m.amount | amount }}
+                          @if (m.deadline) { · {{ 'escrow.detail.milestones.deadline' | translate }}: {{ m.deadline | date:'dd/MM/yy' }} }
+                        </p>
+                      </div>
+
+                      <span class="text-[11px] font-bold px-2 py-0.5 rounded-full shrink-0"
+                            [style.background]="milestoneColor(m.status).badge"
+                            [style.color]="milestoneColor(m.status).icon">
+                        {{ 'escrow.detail.milestones.status.' + m.status | translate }}
+                      </span>
+                    </div>
+
+                    <!-- Seller: deliver action -->
+                    @if (m.status === 'LOCKED' && isSeller(tx)) {
+                      <button
+                        (click)="deliverMilestone(tx.id, m.id)"
+                        [disabled]="deliverMilestoneMutation.isPending()"
+                        class="mt-2.5 w-full flex items-center justify-center gap-2 py-2 rounded-lg text-white text-xs font-bold transition-opacity hover:opacity-90 disabled:opacity-50"
+                        style="background: var(--clr-primary)"
+                      >
+                        @if (deliverMilestoneMutation.isPending()) {
+                          <tui-icon icon="@tui.loader-circle" class="w-3.5 h-3.5 animate-spin" />
+                        } @else {
+                          <tui-icon icon="@tui.send" class="w-3.5 h-3.5" />
+                        }
+                        {{ 'escrow.detail.milestones.actions.deliver' | translate }}
+                      </button>
+                    }
+
+                    <!-- Buyer: release action -->
+                    @if (m.status === 'DELIVERED' && isBuyer(tx)) {
+                      <button
+                        (click)="releaseMilestone(tx.id, m.id)"
+                        [disabled]="releaseMilestoneMutation.isPending()"
+                        class="mt-2.5 w-full flex items-center justify-center gap-2 py-2 rounded-lg text-white text-xs font-bold transition-opacity hover:opacity-90 disabled:opacity-50"
+                        style="background: var(--clr-success)"
+                      >
+                        @if (releaseMilestoneMutation.isPending()) {
+                          <tui-icon icon="@tui.loader-circle" class="w-3.5 h-3.5 animate-spin" />
+                        } @else {
+                          <tui-icon icon="@tui.check" class="w-3.5 h-3.5" />
+                        }
+                        {{ 'escrow.detail.milestones.actions.release' | translate:{amount: m.netAmount | amount} }}
+                      </button>
+                    }
                   </div>
                 }
-              }
+              </div>
             </div>
-          </div>
+          }
 
           <!-- Amount breakdown -->
           <div class="animate-entry bg-white rounded-2xl p-4 shadow-sm">
@@ -264,8 +350,8 @@ const STATUS_ORDER: Record<string, number> = {
             </div>
           }
 
-          <!-- Action: confirm delivery (SHIPPED → buyer) -->
-          @if (isBuyer(tx) && tx.status === 'SHIPPED') {
+          <!-- Action: confirm delivery (SHIPPED → buyer) — STANDARD only -->
+          @if (isBuyer(tx) && tx.status === 'SHIPPED' && tx.transactionMode !== 'FREELANCE') {
             <div class="bg-white rounded-2xl p-4 shadow-sm">
               <h2 class="text-sm font-semibold mb-0.5" style="color: var(--clr-text)">
                 {{ 'escrow.detail.deliverSection.title' | translate }}
@@ -282,8 +368,8 @@ const STATUS_ORDER: Record<string, number> = {
             </div>
           }
 
-          <!-- Action: release funds (DELIVERED → buyer) -->
-          @if (isBuyer(tx) && tx.status === 'DELIVERED') {
+          <!-- Action: release funds (DELIVERED → buyer) — STANDARD only -->
+          @if (isBuyer(tx) && tx.status === 'DELIVERED' && tx.transactionMode !== 'FREELANCE') {
             <div class="bg-white rounded-2xl p-4 shadow-sm">
               <h2 class="text-sm font-semibold mb-0.5" style="color: var(--clr-text)">
                 {{ 'escrow.detail.confirmSection.title' | translate }}
@@ -352,7 +438,7 @@ const STATUS_ORDER: Record<string, number> = {
                 <tui-icon icon="@tui.qr-code" class="w-4 h-4" /> {{ 'escrow.detail.actions.generateQr' | translate }}
               </a>
             }
-            @if (isSeller(tx) && tx.status === 'LOCKED') {
+            @if (isSeller(tx) && tx.status === 'LOCKED' && tx.transactionMode !== 'FREELANCE') {
               <button (click)="ship(tx.id)" [disabled]="shipMutation.isPending()"
                       class="flex items-center justify-center gap-2 w-full py-3 text-white
                        rounded-xl font-semibold text-sm transition-opacity hover:opacity-90 disabled:opacity-50"
@@ -399,12 +485,14 @@ export class TransactionDetailComponent {
   private readonly queryClient = inject(QueryClient);
   private readonly destroyRef  = inject(DestroyRef);
 
-  protected readonly query           = injectEscrowDetailQuery(this.id);
-  protected readonly acceptMutation  = injectAcceptEscrowMutation();
-  protected readonly shipMutation    = injectShipEscrowMutation();
-  protected readonly deliverMutation = injectDeliverEscrowMutation();
-  protected readonly releaseMutation = injectReleaseEscrowMutation();
-  protected readonly cancelMutation  = injectCancelEscrowMutation();
+  protected readonly query                  = injectEscrowDetailQuery(this.id);
+  protected readonly acceptMutation         = injectAcceptEscrowMutation();
+  protected readonly shipMutation           = injectShipEscrowMutation();
+  protected readonly deliverMutation        = injectDeliverEscrowMutation();
+  protected readonly releaseMutation        = injectReleaseEscrowMutation();
+  protected readonly cancelMutation         = injectCancelEscrowMutation();
+  protected readonly deliverMilestoneMutation = injectDeliverMilestoneMutation();
+  protected readonly releaseMilestoneMutation = injectReleaseMilestoneMutation();
 
   protected readonly liveConnected = signal(false);
   protected readonly confirmCode   = signal('');
@@ -479,6 +567,29 @@ export class TransactionDetailComponent {
 
   protected openDispute(id: string): void {
     this.router.navigate(['/disputes/new'], { queryParams: { transactionId: id } });
+  }
+
+  protected deliverMilestone(txId: string, milestoneId: string): void {
+    this.deliverMilestoneMutation.mutate({ txId, milestoneId });
+  }
+
+  protected releaseMilestone(txId: string, milestoneId: string): void {
+    this.releaseMilestoneMutation.mutate({ txId, milestoneId });
+  }
+
+  protected releasedCount(tx: TransactionDetail): number {
+    return tx.milestones?.filter(m => m.status === 'RELEASED').length ?? 0;
+  }
+
+  protected milestoneColor(status: string): { bg: string; border: string; icon: string; badge: string } {
+    const map: Record<string, { bg: string; border: string; icon: string; badge: string }> = {
+      RELEASED:  { bg: 'var(--clr-success-lt)', border: 'var(--clr-success)',  icon: 'var(--clr-success)',  badge: 'rgba(16,185,129,.15)' },
+      DELIVERED: { bg: '#FFFBEB',                border: '#F59E0B',              icon: '#D97706',             badge: 'rgba(245,158,11,.15)' },
+      LOCKED:    { bg: 'var(--clr-primary-lt)',  border: 'var(--clr-primary)',   icon: 'var(--clr-primary)',  badge: 'rgba(27,79,138,.12)'  },
+      CANCELLED: { bg: '#FEF2F2',                border: 'var(--clr-error)',     icon: 'var(--clr-error)',    badge: 'rgba(220,38,38,.1)'   },
+      PENDING:   { bg: '#F8FAFC',                border: 'var(--clr-border)',    icon: '#94A3B8',             badge: 'rgba(148,163,184,.15)' },
+    };
+    return map[status] ?? map['PENDING'];
   }
 
   protected isStepDone(step: string, tx: TransactionDetail): boolean {

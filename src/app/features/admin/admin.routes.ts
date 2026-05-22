@@ -1,11 +1,9 @@
 import { Routes } from '@angular/router';
 import { roleGuard } from '@core/auth/role.guard';
-import { desktopGuard } from '@core/guards/desktop.guard';
 
 export const ADMIN_ROUTES: Routes = [
   {
     path: '',
-    canActivate: [desktopGuard],
     children: [
       {
         path: '',

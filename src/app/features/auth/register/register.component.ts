@@ -111,12 +111,12 @@ function passwordsMatch(c: AbstractControl): ValidationErrors | null {
     }
 
     .brand-name {
-      font-family: 'Cormorant Garamond', 'Times New Roman', serif;
+      font-family: 'Outfit Variable', -apple-system, BlinkMacSystemFont, sans-serif;
       font-size: 2.5rem;
-      font-weight: 700;
+      font-weight: 800;
       color: #fff;
       margin: 0;
-      letter-spacing: 0.01em;
+      letter-spacing: -0.02em;
       line-height: 1;
     }
 
@@ -344,7 +344,7 @@ function passwordsMatch(c: AbstractControl): ValidationErrors | null {
 
       .brand-header { flex-direction: column; align-items: flex-start; gap: 0; }
       .brand-logo { width: 56px; height: 56px; margin-bottom: 0.5rem; }
-      .brand-name { font-size: 4rem; }
+      .brand-name { font-size: 4rem; letter-spacing: -0.02em; }
       .brand-sep { margin: 0.625rem 0 0.5rem; }
       .brand-features { display: flex; }
       .brand-circles { display: block; }
@@ -385,32 +385,32 @@ function passwordsMatch(c: AbstractControl): ValidationErrors | null {
             <h1 class="brand-name">Katica</h1>
           </div>
           <span class="brand-sep"></span>
-          <p class="brand-tagline">Paiements sécurisés au Cameroun</p>
+          <p class="brand-tagline">{{ 'auth.login.tagline' | translate }}</p>
 
           <ul class="brand-features">
             <li class="bf-item">
               <div class="bf-icon" style="background:rgba(27,79,138,.25)">
                 <tui-icon icon="@tui.shield" class="w-5 h-5" />
               </div>
-              Argent bloqué jusqu'à confirmation
+              {{ 'auth.login.features.escrow' | translate }}
             </li>
             <li class="bf-item">
               <div class="bf-icon" style="background:rgba(201,146,13,.2)">
                 <tui-icon icon="@tui.credit-card" class="w-5 h-5" />
               </div>
-              Retraits Mobile Money rapides
+              {{ 'auth.login.features.payout' | translate }}
             </li>
             <li class="bf-item">
               <div class="bf-icon" style="background:rgba(16,185,129,.2)">
                 <tui-icon icon="@tui.check" class="w-4 h-4" />
               </div>
-              Protection acheteur &amp; vendeur
+              {{ 'auth.login.features.protection' | translate }}
             </li>
             <li class="bf-item">
               <div class="bf-icon" style="background:rgba(139,92,246,.18)">
                 <tui-icon icon="@tui.clock" class="w-5 h-5" />
               </div>
-              Résolution de litiges en 48h
+              {{ 'auth.login.features.disputes' | translate }}
             </li>
           </ul>
         </div>
@@ -465,7 +465,7 @@ function passwordsMatch(c: AbstractControl): ValidationErrors | null {
                      [placeholder]="'auth.register.emailPh' | translate"
                      class="field-input" [class.is-error]="isInvalid('email')" />
               @if (isInvalid('email')) {
-                <p class="field-error">Adresse email invalide</p>
+                <p class="field-error">{{ 'auth.register.emailError' | translate }}</p>
               }
             </div>
 
@@ -495,7 +495,7 @@ function passwordsMatch(c: AbstractControl): ValidationErrors | null {
               <label class="field-label">{{ 'auth.register.password' | translate }}</label>
               <div class="pw-wrap">
                 <input [type]="showPwd() ? 'text' : 'password'" formControlName="password"
-                       placeholder="Min. 8 car., 1 maj., 1 chiffre, 1 spécial"
+                       [placeholder]="'auth.register.passwordPh' | translate"
                        class="field-input" [class.is-error]="isInvalid('password')" />
                 <button type="button" class="pw-toggle" (click)="showPwd.set(!showPwd())">
                   @if (showPwd()) {
@@ -531,7 +531,7 @@ function passwordsMatch(c: AbstractControl): ValidationErrors | null {
             <button type="submit" class="submit-btn" [disabled]="form.invalid || loading()">
               @if (loading()) {
                 <tui-icon icon="@tui.loader-circle" class="w-4 h-4 animate-spin" />
-                Inscription en cours…
+                {{ 'auth.register.submitting' | translate }}
               } @else {
                 {{ 'auth.register.submit' | translate }}
                 <tui-icon icon="@tui.arrow-right" class="w-4 h-4" />
@@ -554,6 +554,7 @@ export class RegisterComponent {
   private readonly authStore = inject(AuthStore);
   private readonly toast     = inject(ToastService);
 
+  private readonly translate  = inject(TranslateService);
   protected readonly showPwd = signal(false);
   protected readonly loading = signal(false);
 
@@ -571,7 +572,11 @@ export class RegisterComponent {
 
   protected strengthScore = computed(() => passwordStrength(this.form.get('password')?.value ?? ''));
   protected strengthColor = computed(() => ['#EF4444','#EF4444','#F59E0B','#3A7BC8','#10B981'][this.strengthScore()]);
-  protected strengthLabel = computed(() => ['','Très faible','Faible','Bon','Excellent'][this.strengthScore()]);
+  protected strengthLabel = computed(() => {
+    const keys = ['', 'auth.register.strength.veryWeak', 'auth.register.strength.weak', 'auth.register.strength.good', 'auth.register.strength.excellent'];
+    const k = keys[this.strengthScore()];
+    return k ? this.translate.instant(k) : '';
+  });
 
   protected onSubmit(): void {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
@@ -587,7 +592,7 @@ export class RegisterComponent {
       role: v.role as 'BUYER' | 'SELLER',
     }).subscribe({
       next: () => {
-        this.toast.success('Compte créé avec succès !');
+        this.toast.success(this.translate.instant('toast.registerSuccess'));
         this.authStore.login({ phoneNumber: phone, password });
       },
       error:    () => this.loading.set(false),

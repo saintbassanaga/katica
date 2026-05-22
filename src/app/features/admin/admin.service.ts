@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiService } from '@core/http/api.service';
-import { Page, TransactionSummary } from '@app/models';
+import { Page, TransactionSummary } from '@shared/models/model';
 import { DisputeResponse, ResolutionType } from '@features/disputes/dispute.service';
 import { UserAdminResponse, CreateStaffRequest } from '@shared/models/model';
 

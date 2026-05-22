@@ -1,7 +1,7 @@
 {
   "name": "katica",
   "version": "1.0.0",
-  "packageManager": "yarn@4.13.0",
+  "packageManager": "yarn@1.22.19",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --proxy-config proxy.conf.local.json",
@@ -60,7 +60,7 @@
     "@taiga-ui/icons": "^4.75.0",
     "@taiga-ui/kit": "^4.75.0",
     "@taiga-ui/layout": "^4.75.0",
-    "@taiga-ui/polymorpheus": "4.9.0",
+  "@taiga-ui/polymorpheus": "4.9.0",
     "@tanstack/angular-query-experimental": "^5.94.5",
     "@zxing/browser": "^0.1.5",
     "@zxing/library": "^0.21.3",
