@@ -134,85 +134,193 @@ const STATUS_ORDER: Record<string, number> = {
           <!-- Milestones — FREELANCE mode -->
           @if (tx.transactionMode === 'FREELANCE' && tx.milestones.length) {
             <div class="animate-entry bg-white rounded-2xl p-4 shadow-sm">
-              <div class="flex items-center justify-between mb-3">
-                <h2 class="text-sm font-semibold m-0" style="color: var(--clr-muted)">
-                  {{ 'escrow.detail.milestones.title' | translate }}
-                </h2>
-                <span class="text-xs font-semibold px-2 py-0.5 rounded-full" style="background: var(--clr-primary-lt); color: var(--clr-primary)">
-                  {{ releasedCount(tx) }}/{{ tx.milestones.length }}
-                </span>
+
+              <!-- Header -->
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <h2 class="text-sm font-semibold m-0" style="color: var(--clr-text)">
+                    {{ 'escrow.detail.milestones.title' | translate }}
+                  </h2>
+                  <p class="text-[11px] m-0 mt-0.5" style="color: var(--clr-muted)">
+                    {{ releasedCount(tx) }} {{ 'escrow.detail.milestones.done' | translate }}
+                    @if (activeCount(tx)) { · {{ activeCount(tx) }} {{ 'escrow.detail.milestones.active' | translate }} }
+                    @if (pendingCount(tx)) { · {{ pendingCount(tx) }} {{ 'escrow.detail.milestones.upcoming' | translate }} }
+                  </p>
+                </div>
+                <div class="text-right">
+                  <p class="text-sm font-bold m-0" style="color: var(--clr-success)">{{ releasedAmount(tx) | amount }}</p>
+                  <p class="text-[11px] m-0" style="color: var(--clr-muted)">
+                    {{ 'escrow.detail.milestones.of' | translate }} {{ tx.grossAmount | amount }}
+                  </p>
+                </div>
               </div>
 
-              <div class="flex flex-col gap-2">
+              <!-- Segmented progress bar -->
+              <div class="flex gap-1 mb-4">
                 @for (m of tx.milestones; track m.id) {
-                  <div class="rounded-xl border p-3"
-                       [style.border-color]="milestoneColor(m.status).border"
-                       [style.background]="milestoneColor(m.status).bg">
-                    <div class="flex items-center gap-3">
-                      <!-- Status dot -->
-                      <div class="w-8 h-8 rounded-[10px] shrink-0 flex items-center justify-center text-white text-xs font-bold"
-                           [style.background]="milestoneColor(m.status).icon">
-                        @if (m.status === 'RELEASED') {
-                          <tui-icon icon="@tui.check" class="w-3.5 h-3.5" />
-                        } @else if (m.status === 'DELIVERED') {
-                          <tui-icon icon="@tui.clock" class="w-3.5 h-3.5" />
-                        } @else if (m.status === 'LOCKED') {
-                          <tui-icon icon="@tui.lock-open" class="w-3.5 h-3.5" />
-                        } @else if (m.status === 'CANCELLED') {
-                          <tui-icon icon="@tui.x" class="w-3.5 h-3.5" />
-                        } @else {
-                          <span class="text-[10px]">{{ m.position }}</span>
-                        }
-                      </div>
+                  <div class="flex-1 h-1.5 rounded-full transition-all duration-500"
+                       [style.background]="m.status === 'RELEASED'  ? 'var(--clr-success)' :
+                                           m.status === 'DELIVERED' ? '#F59E0B' :
+                                           m.status === 'LOCKED'    ? 'var(--clr-primary)' :
+                                           m.status === 'CANCELLED' ? 'var(--clr-error)' :
+                                           'var(--clr-border)'">
+                  </div>
+                }
+              </div>
 
-                      <div class="flex-1 min-w-0">
-                        <p class="text-sm font-semibold m-0 truncate" style="color: var(--clr-text)">{{ m.title }}</p>
-                        <p class="text-xs m-0 mt-0.5" style="color: var(--clr-muted)">
-                          {{ m.amount | amount }}
-                          @if (m.deadline) { · {{ 'escrow.detail.milestones.deadline' | translate }}: {{ m.deadline | date:'dd/MM/yy' }} }
-                        </p>
-                      </div>
+              <!-- Timeline -->
+              <div class="flex flex-col">
+                @for (m of tx.milestones; track m.id; let last = $last) {
+                  <div class="relative flex gap-3" [class.pb-3]="!last">
 
-                      <span class="text-[11px] font-bold px-2 py-0.5 rounded-full shrink-0"
-                            [style.background]="milestoneColor(m.status).badge"
-                            [style.color]="milestoneColor(m.status).icon">
-                        {{ 'escrow.detail.milestones.status.' + m.status | translate }}
-                      </span>
+                    <!-- Connector line (absolute, bridges the pb-3 gap perfectly) -->
+                    @if (!last) {
+                      <div class="absolute w-0.5" style="left:15px; top:36px; bottom:0"
+                           [style.background]="m.status === 'RELEASED' ? 'var(--clr-success)' : 'var(--clr-border)'">
+                      </div>
+                    }
+
+                    <!-- Circle -->
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 shrink-0"
+                         style="position:relative; z-index:1"
+                         [style.background]="m.status === 'PENDING' ? 'white' : milestoneColor(m.status).icon"
+                         [style.border-color]="milestoneColor(m.status).border"
+                         [style.color]="m.status === 'PENDING' ? milestoneColor(m.status).icon : 'white'">
+                      @if (m.status === 'RELEASED') {
+                        <tui-icon icon="@tui.check" class="w-3.5 h-3.5" />
+                      } @else if (m.status === 'DELIVERED') {
+                        <tui-icon icon="@tui.clock" class="w-3.5 h-3.5" />
+                      } @else if (m.status === 'LOCKED') {
+                        <tui-icon icon="@tui.lock-open" class="w-3.5 h-3.5" />
+                      } @else if (m.status === 'CANCELLED') {
+                        <tui-icon icon="@tui.x" class="w-3.5 h-3.5" />
+                      } @else {
+                        {{ m.position }}
+                      }
                     </div>
 
-                    <!-- Seller: deliver action -->
-                    @if (m.status === 'LOCKED' && isSeller(tx)) {
-                      <button
-                        (click)="deliverMilestone(tx.id, m.id)"
-                        [disabled]="deliverMilestoneMutation.isPending()"
-                        class="mt-2.5 w-full flex items-center justify-center gap-2 py-2 rounded-lg text-white text-xs font-bold transition-opacity hover:opacity-90 disabled:opacity-50"
-                        style="background: var(--clr-primary)"
-                      >
-                        @if (deliverMilestoneMutation.isPending()) {
-                          <tui-icon icon="@tui.loader-circle" class="w-3.5 h-3.5 animate-spin" />
-                        } @else {
-                          <tui-icon icon="@tui.send" class="w-3.5 h-3.5" />
-                        }
-                        {{ 'escrow.detail.milestones.actions.deliver' | translate }}
-                      </button>
-                    }
+                    <!-- Card -->
+                    <div class="flex-1 min-w-0 rounded-xl border px-3 py-2.5"
+                         [style.border-color]="milestoneColor(m.status).border"
+                         [style.background]="milestoneColor(m.status).bg"
+                         [class.opacity-50]="m.status === 'CANCELLED'">
 
-                    <!-- Buyer: release action -->
-                    @if (m.status === 'DELIVERED' && isBuyer(tx)) {
-                      <button
-                        (click)="releaseMilestone(tx.id, m.id)"
-                        [disabled]="releaseMilestoneMutation.isPending()"
-                        class="mt-2.5 w-full flex items-center justify-center gap-2 py-2 rounded-lg text-white text-xs font-bold transition-opacity hover:opacity-90 disabled:opacity-50"
-                        style="background: var(--clr-success)"
-                      >
-                        @if (releaseMilestoneMutation.isPending()) {
-                          <tui-icon icon="@tui.loader-circle" class="w-3.5 h-3.5 animate-spin" />
-                        } @else {
-                          <tui-icon icon="@tui.check" class="w-3.5 h-3.5" />
+                      <!-- Title + badge -->
+                      <div class="flex items-start gap-2 mb-1">
+                        <p class="flex-1 text-sm font-semibold leading-tight m-0"
+                           [class.line-through]="m.status === 'CANCELLED'"
+                           style="color: var(--clr-text)">{{ m.title }}</p>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 whitespace-nowrap"
+                              [style.background]="milestoneColor(m.status).badge"
+                              [style.color]="milestoneColor(m.status).icon">
+                          {{ 'escrow.detail.milestones.status.' + m.status | translate }}
+                        </span>
+                      </div>
+
+                      <!-- Description -->
+                      @if (m.description) {
+                        <p class="text-xs leading-snug m-0 mb-2" style="color: var(--clr-muted)">{{ m.description }}</p>
+                      }
+
+                      <!-- Amount + fee + deadline -->
+                      <div class="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 mb-1">
+                        <span class="text-sm font-bold" style="color: var(--clr-primary)">{{ m.amount | amount }}</span>
+                        @if (m.platformFeeAmount) {
+                          <span class="text-[11px]" style="color: var(--clr-muted)">
+                            − {{ m.platformFeeAmount | amount }} →
+                            <span class="font-semibold" style="color: var(--clr-success)">{{ m.netAmount | amount }}</span>
+                          </span>
                         }
-                        {{ 'escrow.detail.milestones.actions.release' | translate:{amount: m.netAmount | amount} }}
-                      </button>
-                    }
+                        @if (m.deadline) {
+                          <span class="text-[11px] flex items-center gap-0.5 ml-auto" style="color: var(--clr-muted)">
+                            <tui-icon icon="@tui.calendar" class="w-3 h-3" />
+                            {{ m.deadline | date:'dd MMM' }}
+                          </span>
+                        }
+                      </div>
+
+                      <!-- Contextual callout for DELIVERED -->
+                      @if (m.status === 'DELIVERED') {
+                        @if (isBuyer(tx)) {
+                          <div class="rounded-lg p-2.5 mt-2 flex items-start gap-2"
+                               style="background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.25)">
+                            <tui-icon icon="@tui.info" class="w-3.5 h-3.5 shrink-0 mt-0.5" style="color: #D97706" />
+                            <p class="text-[11px] m-0 leading-snug" style="color: #92400E">
+                              {{ 'escrow.detail.milestones.reviewHint' | translate }}
+                            </p>
+                          </div>
+                        }
+                        @if (isSeller(tx)) {
+                          <div class="rounded-lg p-2.5 mt-2 flex items-start gap-2"
+                               style="background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.25)">
+                            <tui-icon icon="@tui.clock" class="w-3.5 h-3.5 shrink-0 mt-0.5" style="color: #D97706" />
+                            <p class="text-[11px] m-0 leading-snug" style="color: #92400E">
+                              {{ 'escrow.detail.milestones.waitingReview' | translate }}
+                            </p>
+                          </div>
+                        }
+                      }
+
+                      <!-- Event timestamps -->
+                      @if (m.lockedAt || m.deliveredAt || m.releasedAt) {
+                        <div class="flex flex-wrap gap-x-3 gap-y-0.5 mt-2 pt-2 border-t"
+                             style="border-color: var(--clr-border)">
+                          @if (m.lockedAt) {
+                            <span class="text-[10px] flex items-center gap-1" style="color: #94A3B8">
+                              <tui-icon icon="@tui.lock-open" class="w-2.5 h-2.5" />
+                              {{ 'escrow.detail.milestones.startedOn' | translate }} {{ m.lockedAt | date:'dd MMM, HH:mm' }}
+                            </span>
+                          }
+                          @if (m.deliveredAt) {
+                            <span class="text-[10px] flex items-center gap-1" style="color: #94A3B8">
+                              <tui-icon icon="@tui.send" class="w-2.5 h-2.5" />
+                              {{ 'escrow.detail.milestones.submittedOn' | translate }} {{ m.deliveredAt | date:'dd MMM, HH:mm' }}
+                            </span>
+                          }
+                          @if (m.releasedAt) {
+                            <span class="text-[10px] flex items-center gap-1" style="color: var(--clr-success)">
+                              <tui-icon icon="@tui.check" class="w-2.5 h-2.5" />
+                              {{ 'escrow.detail.milestones.releasedOn' | translate }} {{ m.releasedAt | date:'dd MMM, HH:mm' }}
+                            </span>
+                          }
+                        </div>
+                      }
+
+                      <!-- Seller: deliver -->
+                      @if (m.status === 'LOCKED' && isSeller(tx)) {
+                        <button
+                          (click)="deliverMilestone(tx.id, m.id)"
+                          [disabled]="deliverMilestoneMutation.isPending()"
+                          class="mt-2.5 w-full flex items-center justify-center gap-2 py-2 rounded-lg text-white text-xs font-bold transition-opacity hover:opacity-90 disabled:opacity-50"
+                          style="background: var(--clr-primary)"
+                        >
+                          @if (deliverMilestoneMutation.isPending()) {
+                            <tui-icon icon="@tui.loader-circle" class="w-3.5 h-3.5 animate-spin" />
+                          } @else {
+                            <tui-icon icon="@tui.send" class="w-3.5 h-3.5" />
+                          }
+                          {{ 'escrow.detail.milestones.actions.deliver' | translate }}
+                        </button>
+                      }
+
+                      <!-- Buyer: release -->
+                      @if (m.status === 'DELIVERED' && isBuyer(tx)) {
+                        <button
+                          (click)="releaseMilestone(tx.id, m.id)"
+                          [disabled]="releaseMilestoneMutation.isPending()"
+                          class="mt-2.5 w-full flex items-center justify-center gap-2 py-2 rounded-lg text-white text-xs font-bold transition-opacity hover:opacity-90 disabled:opacity-50"
+                          style="background: var(--clr-success)"
+                        >
+                          @if (releaseMilestoneMutation.isPending()) {
+                            <tui-icon icon="@tui.loader-circle" class="w-3.5 h-3.5 animate-spin" />
+                          } @else {
+                            <tui-icon icon="@tui.check" class="w-3.5 h-3.5" />
+                          }
+                          {{ 'escrow.detail.milestones.actions.release' | translate:{amount: m.netAmount | amount} }}
+                        </button>
+                      }
+                    </div>
+
                   </div>
                 }
               </div>
@@ -581,13 +689,30 @@ export class TransactionDetailComponent {
     return tx.milestones?.filter(m => m.status === 'RELEASED').length ?? 0;
   }
 
+  protected activeCount(tx: TransactionDetail): number {
+    return tx.milestones?.filter(m => m.status === 'LOCKED' || m.status === 'DELIVERED').length ?? 0;
+  }
+
+  protected pendingCount(tx: TransactionDetail): number {
+    return tx.milestones?.filter(m => m.status === 'PENDING').length ?? 0;
+  }
+
+  protected releasedAmount(tx: TransactionDetail): number {
+    return tx.milestones?.filter(m => m.status === 'RELEASED').reduce((s, m) => s + m.amount, 0) ?? 0;
+  }
+
+  protected milestoneProgress(tx: TransactionDetail): number {
+    if (!tx.grossAmount) return 0;
+    return Math.round((this.releasedAmount(tx) / tx.grossAmount) * 100);
+  }
+
   protected milestoneColor(status: string): { bg: string; border: string; icon: string; badge: string } {
     const map: Record<string, { bg: string; border: string; icon: string; badge: string }> = {
       RELEASED:  { bg: 'var(--clr-success-lt)', border: 'var(--clr-success)',  icon: 'var(--clr-success)',  badge: 'rgba(16,185,129,.15)' },
       DELIVERED: { bg: '#FFFBEB',                border: '#F59E0B',              icon: '#D97706',             badge: 'rgba(245,158,11,.15)' },
       LOCKED:    { bg: 'var(--clr-primary-lt)',  border: 'var(--clr-primary)',   icon: 'var(--clr-primary)',  badge: 'rgba(27,79,138,.12)'  },
       CANCELLED: { bg: '#FEF2F2',                border: 'var(--clr-error)',     icon: 'var(--clr-error)',    badge: 'rgba(220,38,38,.1)'   },
-      PENDING:   { bg: '#F8FAFC',                border: 'var(--clr-border)',    icon: '#94A3B8',             badge: 'rgba(148,163,184,.15)' },
+      PENDING:   { bg: '#F8FAFC',                border: '#CBD5E1',              icon: '#64748B',             badge: 'rgba(148,163,184,.15)' },
     };
     return map[status] ?? map['PENDING'];
   }

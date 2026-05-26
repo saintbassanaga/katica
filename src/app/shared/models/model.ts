@@ -518,6 +518,7 @@ export interface StatusConfig {
   bg: string;
   color: string;
   dot: string;
+  pulse?: boolean;
 }
 
 export interface NavItem {
