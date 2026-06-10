@@ -20,6 +20,7 @@ import {
   DisputeMessage,
   DisputeStatusEvent,
 } from '../dispute.service';
+import { DisputeRoomWsEvent } from '@shared/models/model';
 import { StompService } from '@core/websocket/stomp.service';
 import { AuthStore } from '@core/auth/auth.store';
 import { ToastService } from '@core/notification/toast.service';
@@ -848,8 +849,6 @@ export class DisputeChatComponent implements OnInit, OnDestroy {
   private readonly localFileMap = new Map<string, File>();
 
   private messageSub?: StompSubscription;
-  private statusSub?: StompSubscription;
-  private typingSub?: StompSubscription;
   private typingTimeout?: ReturnType<typeof setTimeout>;
   private countdownInterval?: ReturnType<typeof setInterval>;
   private isNearBottomState = true;
@@ -951,30 +950,42 @@ export class DisputeChatComponent implements OnInit, OnDestroy {
       await this.stomp.connect();
 
       this.messageSub = this.stomp.subscribe(`/topic/dispute.${id}`);
-      this.stomp.on<DisputeMessage>(`/topic/dispute.${id}`)
-        .subscribe(msg => {
-          this.messages.update(m => [...m, msg]);
-          setTimeout(() => { if (this.isNearBottomState) this.scrollToBottom(); }, 50);
-        });
-
-      this.statusSub = this.stomp.subscribe(`/topic/dispute.${id}.status`);
-      this.stomp.on<DisputeStatusEvent>(`/topic/dispute.${id}.status`)
-        .subscribe(() => {
-          this.disputeService.getDispute(id).subscribe(d => {
-            this.dispute.set(d);
-            this.startCountdown();
-          });
-        });
-
-      this.typingSub = this.stomp.subscribe(`/topic/dispute.${id}.typing`);
-      this.stomp.on<{ userId: string; userName: string; typing: boolean }>(`/topic/dispute.${id}.typing`)
+      this.stomp.on<DisputeRoomWsEvent>(`/topic/dispute.${id}`)
         .subscribe(event => {
-          if (event.userId === this.auth.user()?.userId) return;
-          this.typingUsers.update(users =>
-            event.typing
-              ? (users.includes(event.userName) ? users : [...users, event.userName])
-              : users.filter(u => u !== event.userName)
-          );
+          switch (event.type) {
+            case 'MESSAGE': {
+              const msg: DisputeMessage = {
+                id: event.id,
+                disputeId: event.disputeId,
+                content: event.content,
+                senderId: String(event.senderId),
+                senderName: event.senderName,
+                senderRole: event.senderRole,
+                messageType: event.messageType,
+                internalOnly: event.internalOnly,
+                attachmentCount: event.attachmentCount,
+                attachmentIds: event.attachmentIds,
+                createdAt: String(event.createdAt),
+              };
+              this.messages.update(m => [...m, msg]);
+              setTimeout(() => { if (this.isNearBottomState) this.scrollToBottom(); }, 50);
+              break;
+            }
+            case 'STATUS_CHANGED':
+              this.disputeService.getDispute(id).subscribe(d => {
+                this.dispute.set(d);
+                this.startCountdown();
+              });
+              break;
+            case 'TYPING':
+              if (String(event.userId) === this.auth.user()?.userId) return;
+              this.typingUsers.update(users =>
+                event.typing
+                  ? (users.includes(event.userName) ? users : [...users, event.userName])
+                  : users.filter(u => u !== event.userName)
+              );
+              break;
+          }
         });
 
     } catch {
@@ -989,8 +1000,6 @@ export class DisputeChatComponent implements OnInit, OnDestroy {
       try { this.stomp.publish(`/app/dispute/${this.disputeId()}/typing`, { typing: false }); } catch { /* no-op */ }
     }
     this.messageSub?.unsubscribe();
-    this.statusSub?.unsubscribe();
-    this.typingSub?.unsubscribe();
   }
 
   protected payArbitrationFee(): void {

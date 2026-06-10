@@ -342,6 +342,14 @@ export interface DisputeStatusEvent {
   timestamp: string;
 }
 
+export type DisputeRoomWsEvent =
+  | { type: 'MESSAGE'; id: string; disputeId: string; senderId: string; senderName: string; senderRole: string; content: string; messageType: string; internalOnly: boolean; attachmentCount: number; attachmentIds: string | null; createdAt: string; }
+  | { type: 'TYPING'; disputeId: string; userId: string; userName: string; typing: boolean; timestamp: string; }
+  | { type: 'STATUS_CHANGED'; disputeId: string; disputeReference: string; eventType: string; message: string; timestamp: string; }
+  | { type: 'EVIDENCE_ADDED'; disputeId: string; evidenceId: string; uploaderId: string; uploaderName: string; uploaderRole: string; evidenceType: string; originalFileName: string; fileSize: number; description: string; createdAt: string; }
+  | { type: 'READ_RECEIPT'; disputeId: string; userId: string; role: string; readAt: string; }
+  | { type: 'PRESENCE'; disputeId: string; eventType: string; userId: string; userName: string; onlineUsers: { userId: string; userName: string }[]; timestamp: string; };
+
 
 export interface ReasonGroup {
   groupKey: string;

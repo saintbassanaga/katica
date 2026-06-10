@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal, PLATFORM_ID } from '@angular/core';
+import { Component, computed, effect, inject, signal, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -6,6 +6,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs';
 import { TuiRoot } from '@taiga-ui/core';
 import { AuthStore } from './core/auth/auth.store';
+import { NotificationStore } from './features/notifications/notification.store';
 import { BottomNavComponent } from './shared/components/bottom-nav/bottom-nav.component';
 import { SidebarComponent } from './shared/components/sidebar/sidebar.component';
 import { FabComponent } from './shared/components/fab/fab.component';
@@ -27,14 +28,22 @@ const FULL_SCREEN_PATTERNS = [
   styleUrl: './app.scss',
 })
 export class App {
-  protected readonly auth       = inject(AuthStore);
-  private  readonly router      = inject(Router);
-  private  readonly bp          = inject(BreakpointObserver);
-  private  readonly platformId  = inject(PLATFORM_ID);
+  protected readonly auth              = inject(AuthStore);
+  private  readonly router             = inject(Router);
+  private  readonly bp                 = inject(BreakpointObserver);
+  private  readonly platformId         = inject(PLATFORM_ID);
+  private  readonly notificationStore  = inject(NotificationStore);
 
   private readonly _onboardingDismissed = signal(
     isPlatformBrowser(this.platformId) && !!localStorage.getItem('katica_onboarded'),
   );
+
+  constructor() {
+    effect(() => {
+      const userId = this.auth.userId();
+      if (userId) this.notificationStore.connectWs(userId);
+    });
+  }
 
   protected readonly showOnboardingOverlay = computed(() =>
     this.auth.isAuthenticated() && !this._onboardingDismissed(),

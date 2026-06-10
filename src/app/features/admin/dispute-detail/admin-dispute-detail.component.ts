@@ -6,7 +6,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { StompSubscription } from '@stomp/stompjs';
 import { AdminService } from '../admin.service';
 import { DisputeResponse, ResolutionType } from '@features/disputes/dispute.service';
-import { DisputeMessage } from '@shared/models/model';
+import { DisputeMessage, DisputeRoomWsEvent } from '@shared/models/model';
 import { AuthStore } from '@core/auth/auth.store';
 import { ToastService } from '@core/notification/toast.service';
 import { StompService } from '@core/websocket/stomp.service';
@@ -427,6 +427,7 @@ export class AdminDisputeDetailComponent implements OnInit, OnDestroy {
   private readonly stomp         = inject(StompService);
 
   private msgSub: StompSubscription | null = null;
+  private internalSub: StompSubscription | null = null;
 
   protected readonly dispute          = signal<DisputeResponse | null>(null);
   protected readonly loading          = signal(true);
@@ -455,7 +456,7 @@ export class AdminDisputeDetailComponent implements OnInit, OnDestroy {
         this.dispute.set(d);
         this.messages.set(d.messages ?? []);
         this.loading.set(false);
-        if (this.isSupport()) this.connectWs(d.id);
+        this.connectWs(d.id);
       },
       error: () => this.loading.set(false),
     });
@@ -465,13 +466,37 @@ export class AdminDisputeDetailComponent implements OnInit, OnDestroy {
     try {
       await this.stomp.connect();
       this.msgSub = this.stomp.subscribe(`/topic/dispute.${disputeId}`);
-      this.stomp.on<DisputeMessage>(`/topic/dispute.${disputeId}`)
-        .subscribe(msg => this.messages.update(m => [...m, msg]));
+      this.stomp.on<DisputeRoomWsEvent>(`/topic/dispute.${disputeId}`)
+        .subscribe(event => {
+          if (event.type === 'MESSAGE') this.messages.update(m => [...m, this.toMessage(event)]);
+        });
+      this.internalSub = this.stomp.subscribe(`/topic/dispute.${disputeId}.internal`);
+      this.stomp.on<DisputeRoomWsEvent>(`/topic/dispute.${disputeId}.internal`)
+        .subscribe(event => {
+          if (event.type === 'MESSAGE') this.messages.update(m => [...m, this.toMessage(event)]);
+        });
     } catch { /* WS unavailable — read-only degraded */ }
+  }
+
+  private toMessage(event: Extract<DisputeRoomWsEvent, { type: 'MESSAGE' }>): DisputeMessage {
+    return {
+      id: event.id,
+      disputeId: event.disputeId,
+      content: event.content,
+      senderId: String(event.senderId),
+      senderName: event.senderName,
+      senderRole: event.senderRole,
+      messageType: event.messageType,
+      internalOnly: event.internalOnly,
+      attachmentCount: event.attachmentCount,
+      attachmentIds: event.attachmentIds,
+      createdAt: String(event.createdAt),
+    };
   }
 
   ngOnDestroy(): void {
     this.msgSub?.unsubscribe();
+    this.internalSub?.unsubscribe();
   }
 
   protected onMsgEnter(e: Event): void {

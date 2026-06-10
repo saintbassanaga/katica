@@ -1,22 +1,25 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable, OnDestroy, PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Client, IMessage, StompSubscription } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
 import { Observable, Subject, filter, map, share } from 'rxjs';
 import { environment } from '@env/environment';
 import { StompMessage } from '@shared/models/model';
 
 @Injectable({ providedIn: 'root' })
 export class StompService implements OnDestroy {
+  private readonly platformId = inject(PLATFORM_ID);
   private client!: Client;
   private readonly messages$ = new Subject<StompMessage>();
   private connectPromise: Promise<void> | null = null;
 
   connect(): Promise<void> {
+    if (!isPlatformBrowser(this.platformId)) return Promise.resolve();
     if (this.connectPromise) return this.connectPromise;
 
-    this.connectPromise = new Promise((resolve, reject) => {
+    this.connectPromise = new Promise(async (resolve, reject) => {
+      const SockJS = (await import('sockjs-client')).default;
       this.client = new Client({
-        webSocketFactory: () => new (SockJS as any)(environment.wsUrl),
+        webSocketFactory: () => new SockJS(environment.wsUrl),
         reconnectDelay: 5000,
         onConnect: () => resolve(),
         onStompError: frame => reject(new Error(frame.headers['message'])),
