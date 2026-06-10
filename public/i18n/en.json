@@ -303,7 +303,8 @@
       "typingOne": "{{name}} is typing…",
       "typing": "{{name}} is typing…",
       "placeholder": "Your message…",
-      "messagePh": "Your message…"
+      "messagePh": "Your message…",
+      "connectionError": "Connection lost. Check your network and try again."
     },
     "evidence": {
       "panelTitle": "Attach evidence",
@@ -323,28 +324,28 @@
       "errorToast": "Failed to submit file",
       "types": {
         "SCREENSHOT": "Screenshot",
-        "IMAGE":      "Photo / Image",
-        "DOCUMENT":   "Document / PDF",
-        "RECEIPT":    "Receipt",
-        "VIDEO":      "Video",
-        "OTHER":      "Other"
+        "IMAGE": "Photo / Image",
+        "DOCUMENT": "Document / PDF",
+        "RECEIPT": "Receipt",
+        "VIDEO": "Video",
+        "OTHER": "Other"
       }
     },
     "resolve": {
       "button": "Resolve",
       "title": "Resolve dispute",
       "subtitle": "Choose how to distribute the funds.",
-      "fullRefundBuyer":        "Full refund to buyer",
-      "fullRefundBuyerDesc":    "The full amount is refunded to the buyer.",
-      "releaseToSeller":        "Release to seller",
-      "releaseToSellerDesc":    "Funds are released to the seller as planned.",
-      "partialRefundBuyer":     "Partial refund",
+      "fullRefundBuyer": "Full refund to buyer",
+      "fullRefundBuyerDesc": "The full amount is refunded to the buyer.",
+      "releaseToSeller": "Release to seller",
+      "releaseToSellerDesc": "Funds are released to the seller as planned.",
+      "partialRefundBuyer": "Partial refund",
       "partialRefundBuyerDesc": "Part of the amount is refunded to the buyer, the rest goes to the seller.",
-      "split5050":              "Split 50/50",
-      "split5050Desc":          "Funds are split equally between both parties.",
-      "noAction":               "No action",
-      "noActionDesc":           "The dispute is closed without redistributing funds.",
-      "successToast":           "Dispute resolved successfully"
+      "split5050": "Split 50/50",
+      "split5050Desc": "Funds are split equally between both parties.",
+      "noAction": "No action",
+      "noActionDesc": "The dispute is closed without redistributing funds.",
+      "successToast": "Dispute resolved successfully"
     },
     "empty": {
       "title": "No disputes",
@@ -383,34 +384,34 @@
       "releasedLabel": "Released to seller"
     },
     "categories": {
-      "delivery":      "Delivery",
-      "quality":       "Quality / Compliance",
-      "service":       "Service",
+      "delivery": "Delivery",
+      "quality": "Quality / Compliance",
+      "service": "Service",
       "communication": "Communication",
-      "financial":     "Billing",
-      "fraud":         "Fraud",
-      "other":         "Other"
+      "financial": "Billing",
+      "fraud": "Fraud",
+      "other": "Other"
     },
     "reasons": {
-      "NOT_RECEIVED":            "Package not received",
-      "LATE_DELIVERY":           "Late delivery",
-      "WRONG_ADDRESS":           "Wrong delivery address",
-      "PARTIAL_DELIVERY":        "Partial delivery",
-      "NOT_AS_DESCRIBED":        "Item not as described",
-      "DEFECTIVE":               "Defective item",
-      "COUNTERFEIT":             "Suspected counterfeit",
-      "WRONG_ITEM":              "Wrong item received",
-      "QUALITY_ISSUE":           "Quality issue",
-      "SERVICE_NOT_RENDERED":    "Service not rendered",
-      "SERVICE_INCOMPLETE":      "Incomplete service",
-      "SERVICE_UNSATISFACTORY":  "Unsatisfactory service",
-      "SELLER_UNRESPONSIVE":     "Seller unresponsive",
-      "BUYER_UNRESPONSIVE":      "Buyer unresponsive",
-      "OVERCHARGED":             "Overcharged",
-      "HIDDEN_FEES":             "Hidden fees",
-      "SUSPECTED_FRAUD":         "Suspected fraud",
-      "UNAUTHORIZED_TRANSACTION":"Unauthorized transaction",
-      "OTHER":                   "Other reason"
+      "NOT_RECEIVED": "Package not received",
+      "LATE_DELIVERY": "Late delivery",
+      "WRONG_ADDRESS": "Wrong delivery address",
+      "PARTIAL_DELIVERY": "Partial delivery",
+      "NOT_AS_DESCRIBED": "Item not as described",
+      "DEFECTIVE": "Defective item",
+      "COUNTERFEIT": "Suspected counterfeit",
+      "WRONG_ITEM": "Wrong item received",
+      "QUALITY_ISSUE": "Quality issue",
+      "SERVICE_NOT_RENDERED": "Service not rendered",
+      "SERVICE_INCOMPLETE": "Incomplete service",
+      "SERVICE_UNSATISFACTORY": "Unsatisfactory service",
+      "SELLER_UNRESPONSIVE": "Seller unresponsive",
+      "BUYER_UNRESPONSIVE": "Buyer unresponsive",
+      "OVERCHARGED": "Overcharged",
+      "HIDDEN_FEES": "Hidden fees",
+      "SUSPECTED_FRAUD": "Suspected fraud",
+      "UNAUTHORIZED_TRANSACTION": "Unauthorized transaction",
+      "OTHER": "Other reason"
     },
     "details": {
       "title": "Details",
@@ -891,26 +892,26 @@
       "back": "Back to home"
     },
     "codes": {
-      "RATE_LIMIT_EXCEEDED":                "Too many attempts. Please try again in a few minutes.",
-      "INSUFFICIENT_BALANCE":               "Insufficient balance for this operation.",
-      "TRANSACTION_NOT_FOUND":              "Transaction not found.",
-      "INVALID_MFA_CODE":                   "Invalid verification code.",
-      "INVALID_OTP":                        "Invalid or expired OTP code.",
-      "DISPUTE_ALREADY_EXISTS":             "A dispute is already open for this transaction.",
-      "DISPUTE_NOT_FOUND":                  "Dispute not found.",
-      "DISPUTE_ALREADY_TERMINAL":           "This dispute is already closed.",
-      "ARBITRATION_NOT_AWAITING_PAYMENT":   "This dispute is not awaiting arbitration payment.",
-      "ARBITRATION_SUBMISSION_EXPIRED":     "The deadline has passed. The outcome will be applied automatically.",
-      "ARBITRATION_ALREADY_SUBMITTED":      "You have already paid the arbitration fee for this dispute.",
-      "OFFLINE":                            "Please check your internet connection.",
-      "default":                            "An error occurred. Please try again."
+      "RATE_LIMIT_EXCEEDED": "Too many attempts. Please try again in a few minutes.",
+      "INSUFFICIENT_BALANCE": "Insufficient balance for this operation.",
+      "TRANSACTION_NOT_FOUND": "Transaction not found.",
+      "INVALID_MFA_CODE": "Invalid verification code.",
+      "INVALID_OTP": "Invalid or expired OTP code.",
+      "DISPUTE_ALREADY_EXISTS": "A dispute is already open for this transaction.",
+      "DISPUTE_NOT_FOUND": "Dispute not found.",
+      "DISPUTE_ALREADY_TERMINAL": "This dispute is already closed.",
+      "ARBITRATION_NOT_AWAITING_PAYMENT": "This dispute is not awaiting arbitration payment.",
+      "ARBITRATION_SUBMISSION_EXPIRED": "The deadline has passed. The outcome will be applied automatically.",
+      "ARBITRATION_ALREADY_SUBMITTED": "You have already paid the arbitration fee for this dispute.",
+      "OFFLINE": "Please check your internet connection.",
+      "default": "An error occurred. Please try again."
     }
   },
   "roles": {
-    "BUYER":      "Buyer",
-    "SELLER":     "Seller",
-    "ADMIN":      "Admin",
-    "SUPPORT":    "Support",
+    "BUYER": "Buyer",
+    "SELLER": "Seller",
+    "ADMIN": "Admin",
+    "SUPPORT": "Support",
     "SUPERVISOR": "Supervisor"
   }
 }

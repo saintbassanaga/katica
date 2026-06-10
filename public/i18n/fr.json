@@ -303,7 +303,8 @@
       "typingOne": "{{name}} est en train d'écrire…",
       "typing": "{{name}} est en train d'écrire…",
       "placeholder": "Votre message…",
-      "messagePh": "Votre message…"
+      "messagePh": "Votre message…",
+      "connectionError": "Connexion perdue. Vérifiez votre réseau et réessayez."
     },
     "evidence": {
       "panelTitle": "Joindre une preuve",
@@ -323,28 +324,28 @@
       "errorToast": "Échec de l'envoi du fichier",
       "types": {
         "SCREENSHOT": "Capture d'écran",
-        "IMAGE":      "Photo / Image",
-        "DOCUMENT":   "Document / PDF",
-        "RECEIPT":    "Reçu",
-        "VIDEO":      "Vidéo",
-        "OTHER":      "Autre"
+        "IMAGE": "Photo / Image",
+        "DOCUMENT": "Document / PDF",
+        "RECEIPT": "Reçu",
+        "VIDEO": "Vidéo",
+        "OTHER": "Autre"
       }
     },
     "resolve": {
       "button": "Résoudre",
       "title": "Résolution du litige",
       "subtitle": "Choisissez comment distribuer les fonds.",
-      "fullRefundBuyer":        "Remboursement intégral",
-      "fullRefundBuyerDesc":    "L'intégralité du montant est remboursée à l'acheteur.",
-      "releaseToSeller":        "Libérer au vendeur",
-      "releaseToSellerDesc":    "Les fonds sont libérés au vendeur comme prévu.",
-      "partialRefundBuyer":     "Remboursement partiel",
+      "fullRefundBuyer": "Remboursement intégral",
+      "fullRefundBuyerDesc": "L'intégralité du montant est remboursée à l'acheteur.",
+      "releaseToSeller": "Libérer au vendeur",
+      "releaseToSellerDesc": "Les fonds sont libérés au vendeur comme prévu.",
+      "partialRefundBuyer": "Remboursement partiel",
       "partialRefundBuyerDesc": "Une partie est remboursée à l'acheteur, le reste au vendeur.",
-      "split5050":              "Partage 50/50",
-      "split5050Desc":          "Les fonds sont partagés équitablement entre les deux parties.",
-      "noAction":               "Aucune action",
-      "noActionDesc":           "Le litige est clôturé sans redistribution des fonds.",
-      "successToast":           "Litige résolu avec succès"
+      "split5050": "Partage 50/50",
+      "split5050Desc": "Les fonds sont partagés équitablement entre les deux parties.",
+      "noAction": "Aucune action",
+      "noActionDesc": "Le litige est clôturé sans redistribution des fonds.",
+      "successToast": "Litige résolu avec succès"
     },
     "empty": {
       "title": "Aucun litige",
@@ -383,34 +384,34 @@
       "releasedLabel": "Versé au vendeur"
     },
     "categories": {
-      "delivery":      "Livraison",
-      "quality":       "Qualité / Conformité",
-      "service":       "Service",
+      "delivery": "Livraison",
+      "quality": "Qualité / Conformité",
+      "service": "Service",
       "communication": "Communication",
-      "financial":     "Facturation",
-      "fraud":         "Fraude",
-      "other":         "Autre"
+      "financial": "Facturation",
+      "fraud": "Fraude",
+      "other": "Autre"
     },
     "reasons": {
-      "NOT_RECEIVED":            "Colis non reçu",
-      "LATE_DELIVERY":           "Livraison en retard",
-      "WRONG_ADDRESS":           "Mauvaise adresse de livraison",
-      "PARTIAL_DELIVERY":        "Livraison partielle",
-      "NOT_AS_DESCRIBED":        "Article non conforme à l'annonce",
-      "DEFECTIVE":               "Article défectueux",
-      "COUNTERFEIT":             "Contrefaçon suspectée",
-      "WRONG_ITEM":              "Mauvais article reçu",
-      "QUALITY_ISSUE":           "Problème de qualité",
-      "SERVICE_NOT_RENDERED":    "Service non rendu",
-      "SERVICE_INCOMPLETE":      "Service incomplet",
-      "SERVICE_UNSATISFACTORY":  "Service insatisfaisant",
-      "SELLER_UNRESPONSIVE":     "Vendeur injoignable",
-      "BUYER_UNRESPONSIVE":      "Acheteur injoignable",
-      "OVERCHARGED":             "Surfacturation",
-      "HIDDEN_FEES":             "Frais cachés",
-      "SUSPECTED_FRAUD":         "Fraude suspectée",
-      "UNAUTHORIZED_TRANSACTION":"Transaction non autorisée",
-      "OTHER":                   "Autre motif"
+      "NOT_RECEIVED": "Colis non reçu",
+      "LATE_DELIVERY": "Livraison en retard",
+      "WRONG_ADDRESS": "Mauvaise adresse de livraison",
+      "PARTIAL_DELIVERY": "Livraison partielle",
+      "NOT_AS_DESCRIBED": "Article non conforme à l'annonce",
+      "DEFECTIVE": "Article défectueux",
+      "COUNTERFEIT": "Contrefaçon suspectée",
+      "WRONG_ITEM": "Mauvais article reçu",
+      "QUALITY_ISSUE": "Problème de qualité",
+      "SERVICE_NOT_RENDERED": "Service non rendu",
+      "SERVICE_INCOMPLETE": "Service incomplet",
+      "SERVICE_UNSATISFACTORY": "Service insatisfaisant",
+      "SELLER_UNRESPONSIVE": "Vendeur injoignable",
+      "BUYER_UNRESPONSIVE": "Acheteur injoignable",
+      "OVERCHARGED": "Surfacturation",
+      "HIDDEN_FEES": "Frais cachés",
+      "SUSPECTED_FRAUD": "Fraude suspectée",
+      "UNAUTHORIZED_TRANSACTION": "Transaction non autorisée",
+      "OTHER": "Autre motif"
     },
     "details": {
       "title": "Détails",
@@ -891,26 +892,26 @@
       "back": "Retour à l'accueil"
     },
     "codes": {
-      "RATE_LIMIT_EXCEEDED":                "Trop de tentatives. Réessayez dans quelques minutes.",
-      "INSUFFICIENT_BALANCE":               "Solde insuffisant pour cette opération.",
-      "TRANSACTION_NOT_FOUND":              "Transaction introuvable.",
-      "INVALID_MFA_CODE":                   "Code de vérification invalide.",
-      "INVALID_OTP":                        "Code OTP invalide ou expiré.",
-      "DISPUTE_ALREADY_EXISTS":             "Un litige est déjà en cours pour cette transaction.",
-      "DISPUTE_NOT_FOUND":                  "Litige introuvable.",
-      "DISPUTE_ALREADY_TERMINAL":           "Ce litige est déjà clôturé.",
-      "ARBITRATION_NOT_AWAITING_PAYMENT":   "Ce litige n'est pas en attente de paiement d'arbitrage.",
-      "ARBITRATION_SUBMISSION_EXPIRED":     "Le délai est dépassé. Le résultat sera appliqué automatiquement.",
-      "ARBITRATION_ALREADY_SUBMITTED":      "Vous avez déjà payé les frais d'arbitrage pour ce litige.",
-      "OFFLINE":                            "Vérifiez votre connexion internet.",
-      "default":                            "Une erreur est survenue. Réessayez."
+      "RATE_LIMIT_EXCEEDED": "Trop de tentatives. Réessayez dans quelques minutes.",
+      "INSUFFICIENT_BALANCE": "Solde insuffisant pour cette opération.",
+      "TRANSACTION_NOT_FOUND": "Transaction introuvable.",
+      "INVALID_MFA_CODE": "Code de vérification invalide.",
+      "INVALID_OTP": "Code OTP invalide ou expiré.",
+      "DISPUTE_ALREADY_EXISTS": "Un litige est déjà en cours pour cette transaction.",
+      "DISPUTE_NOT_FOUND": "Litige introuvable.",
+      "DISPUTE_ALREADY_TERMINAL": "Ce litige est déjà clôturé.",
+      "ARBITRATION_NOT_AWAITING_PAYMENT": "Ce litige n'est pas en attente de paiement d'arbitrage.",
+      "ARBITRATION_SUBMISSION_EXPIRED": "Le délai est dépassé. Le résultat sera appliqué automatiquement.",
+      "ARBITRATION_ALREADY_SUBMITTED": "Vous avez déjà payé les frais d'arbitrage pour ce litige.",
+      "OFFLINE": "Vérifiez votre connexion internet.",
+      "default": "Une erreur est survenue. Réessayez."
     }
   },
   "roles": {
-    "BUYER":      "Acheteur",
-    "SELLER":     "Vendeur",
-    "ADMIN":      "Admin",
-    "SUPPORT":    "Support",
+    "BUYER": "Acheteur",
+    "SELLER": "Vendeur",
+    "ADMIN": "Admin",
+    "SUPPORT": "Support",
     "SUPERVISOR": "Superviseur"
   }
 }

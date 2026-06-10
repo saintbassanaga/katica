@@ -8,9 +8,13 @@ import { StompMessage } from '@shared/models/model';
 @Injectable({ providedIn: 'root' })
 export class StompService implements OnDestroy {
   private readonly platformId = inject(PLATFORM_ID);
-  private client!: Client;
+  private client: Client | undefined;
   private readonly messages$ = new Subject<StompMessage>();
   private connectPromise: Promise<void> | null = null;
+
+  get connected(): boolean {
+    return this.client?.connected ?? false;
+  }
 
   connect(): Promise<void> {
     if (!isPlatformBrowser(this.platformId)) return Promise.resolve();
@@ -22,8 +26,14 @@ export class StompService implements OnDestroy {
         webSocketFactory: () => new SockJS(environment.wsUrl),
         reconnectDelay: 5000,
         onConnect: () => resolve(),
-        onStompError: frame => reject(new Error(frame.headers['message'])),
-        onWebSocketError: err => reject(err),
+        onStompError: frame => {
+          this.connectPromise = null;
+          reject(new Error(frame.headers['message']));
+        },
+        onWebSocketError: err => {
+          this.connectPromise = null;
+          reject(err);
+        },
       });
       this.client.activate();
     });
@@ -40,6 +50,7 @@ export class StompService implements OnDestroy {
   }
 
   subscribe(destination: string): StompSubscription {
+    if (!this.client) throw new Error('StompService: call connect() before subscribe()');
     return this.client.subscribe(destination, (frame: IMessage) => {
       this.messages$.next({
         destination,
@@ -49,6 +60,7 @@ export class StompService implements OnDestroy {
   }
 
   publish(destination: string, body: object): void {
+    if (!this.client?.connected) throw new Error('not_connected');
     this.client.publish({ destination, body: JSON.stringify(body) });
   }
 

@@ -946,7 +946,11 @@ export class DisputeChatComponent implements OnInit, OnDestroy {
       this.messages.set(detail.messages ?? []);
       setTimeout(() => this.scrollToBottom(), 100);
       this.startCountdown();
+    } catch {
+      return;
+    }
 
+    try {
       await this.stomp.connect();
 
       this.messageSub = this.stomp.subscribe(`/topic/dispute.${id}`);
@@ -987,9 +991,8 @@ export class DisputeChatComponent implements OnInit, OnDestroy {
               break;
           }
         });
-
     } catch {
-      // handled by error interceptor toast
+      // WS unavailable — read-only degraded
     }
   }
 
@@ -1049,8 +1052,10 @@ export class DisputeChatComponent implements OnInit, OnDestroy {
       this.stomp.publish(`/app/dispute/${this.disputeId()}/message`, { content, internalOnly: false });
       this.messageText.set('');
       clearTimeout(this.typingTimeout);
-      this.stomp.publish(`/app/dispute/${this.disputeId()}/typing`, { typing: false });
+      try { this.stomp.publish(`/app/dispute/${this.disputeId()}/typing`, { typing: false }); } catch { /* no-op */ }
       setTimeout(() => { this.isNearBottomState = false; this.scrollToBottom(); }, 50);
+    } catch {
+      this.toast.error(this.translate.instant('disputes.chat.connectionError'));
     } finally {
       this.sending.set(false);
     }
@@ -1058,10 +1063,11 @@ export class DisputeChatComponent implements OnInit, OnDestroy {
 
   protected onTyping(value: string): void {
     this.messageText.set(value);
+    if (!this.stomp.connected) return;
     this.stomp.publish(`/app/dispute/${this.disputeId()}/typing`, { typing: true });
     clearTimeout(this.typingTimeout);
     this.typingTimeout = setTimeout(() => {
-      this.stomp.publish(`/app/dispute/${this.disputeId()}/typing`, { typing: false });
+      try { this.stomp.publish(`/app/dispute/${this.disputeId()}/typing`, { typing: false }); } catch { /* no-op */ }
     }, 2000);
   }
 
