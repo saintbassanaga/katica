@@ -3,7 +3,7 @@
 export interface UserProfile {
   userId: string;
   fullName: string;
-  role?: 'BUYER' | 'SELLER' | 'BOTH' | 'ADMIN' | 'SUPPORT' | 'SUPERVISOR';
+  role?: 'BUYER' | 'SELLER' | 'BOTH';
   email?: string;
   mfaEnabled: boolean;
   verified?: boolean;
@@ -19,7 +19,7 @@ export interface UserProfileResponse {
   email: string | null;
   emailVerified: boolean;
   cniProvided: boolean;
-  role: 'BUYER' | 'SELLER' | 'BOTH' | 'ADMIN' | 'SUPPORT' | 'SUPERVISOR';
+  role: 'BUYER' | 'SELLER' | 'BOTH';
   verified: boolean;
   mfaEnabled: boolean;
   addressStreet: string | null;
@@ -329,7 +329,7 @@ export interface CreateDisputeRequest {
 
 export interface ResolveDisputeRequest {
   resolutionType: ResolutionType;
-  actorType?: 'BUYER' | 'SELLER' | 'ADMIN' | 'SUPERVISOR' | 'SUPPORT';
+  actorType?: 'BUYER' | 'SELLER';
   actorId?: string;
   sellerPercent?: number;
 }
@@ -459,57 +459,6 @@ export interface WalletInfo {
   amount: number;
   frozen: number;
   currency: string;
-}
-
-// ── Admin ─────────────────────────────────────────────────────
-
-export interface AdminDashboardStats {
-  totalUsers: number;
-  activeUsers: number;
-  totalBuyers: number;
-  totalSellers: number;
-  totalStaff: number;
-  totalTransactions: number;
-  initiatedTransactions: number;
-  lockedTransactions: number;
-  releasedTransactions: number;
-  disputedTransactions: number;
-  cancelledTransactions: number;
-  totalVolumeReleased: string;
-  totalDisputes: number;
-  openDisputes: number;
-  underReviewDisputes: number;
-  referredToArbitrationDisputes: number;
-  resolvedDisputes: number;
-}
-
-export interface UserAdminResponse {
-  id: string;
-  fullName: string;
-  role: 'BUYER' | 'SELLER' | 'BOTH' | 'SUPPORT' | 'SUPERVISOR' | 'ADMIN';
-  verified: boolean;
-  active: boolean;
-  deleted: boolean;
-  createdAt: string;
-  updatedAt: string;
-  lastLoginAt: string | null;
-}
-
-export interface CreateStaffRequest {
-  fullName: string;
-  phoneNumber: string;
-  email: string;
-  role: 'SUPPORT' | 'SUPERVISOR';
-  password: string;
-}
-
-export interface AssignDisputeRequest {
-  agentId: string;
-}
-
-export interface UpdateDisputeStatusRequest {
-  status: 'AWAITING_BUYER' | 'AWAITING_SELLER';
-  note?: string;
 }
 
 // ── UI / Shared ───────────────────────────────────────────────

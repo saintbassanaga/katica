@@ -17,12 +17,8 @@
       <router-outlet />
     </main>
 
-    @if (showNav() && !showOnboardingOverlay()) {
+    @if (showNav()) {
       <app-fab />
-    }
-
-    @if (showOnboardingOverlay()) {
-      <app-onboarding (done)="onOnboardingDone()" />
     }
 
   </div>

@@ -1,7 +1,5 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '@core/auth/auth.guard';
-import { roleGuard } from '@core/auth/role.guard';
-import { staffRedirectGuard } from '@core/auth/staff-redirect.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -12,31 +10,31 @@ export const routes: Routes = [
   },
   {
     path: 'dashboard',
-    canActivate: [authGuard, staffRedirectGuard],
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
   },
   {
     path: 'escrow',
-    canActivate: [authGuard, staffRedirectGuard],
+    canActivate: [authGuard],
     loadChildren: () =>
       import('./features/escrow/escrow.routes').then(m => m.ESCROW_ROUTES),
   },
   {
     path: 'disputes',
-    canActivate: [authGuard, staffRedirectGuard],
+    canActivate: [authGuard],
     loadChildren: () =>
       import('./features/disputes/disputes.routes').then(m => m.DISPUTE_ROUTES),
   },
   {
     path: 'payouts',
-    canActivate: [authGuard, staffRedirectGuard],
+    canActivate: [authGuard],
     loadChildren: () =>
       import('./features/payouts/payouts.routes').then(m => m.PAYOUT_ROUTES),
   },
   {
     path: 'wallet',
-    canActivate: [authGuard, staffRedirectGuard],
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/wallet/wallet.component').then(m => m.WalletComponent),
   },
@@ -53,20 +51,9 @@ export const routes: Routes = [
       import('./features/profile/profile.routes').then(m => m.PROFILE_ROUTES),
   },
   {
-    path: 'admin',
-    canActivate: [authGuard, roleGuard('ADMIN', 'SUPERVISOR', 'SUPPORT')],
-    loadChildren: () =>
-      import('./features/admin/admin.routes').then(m => m.ADMIN_ROUTES),
-  },
-  {
     path: 'reset-password',
     loadComponent: () =>
       import('./features/auth/reset-password/reset-password.component').then(m => m.ResetPasswordComponent),
-  },
-  {
-    path: 'admin-desktop-only',
-    loadComponent: () =>
-      import('./shared/components/desktop-only/desktop-only.component').then(m => m.DesktopOnlyComponent),
   },
   {
     path: '403',

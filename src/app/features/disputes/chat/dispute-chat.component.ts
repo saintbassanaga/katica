@@ -1091,7 +1091,7 @@ export class DisputeChatComponent implements OnInit, OnDestroy {
     return !!uid && String(msg.senderId) === String(uid);
   }
 
-  private static readonly STAFF_ROLES = new Set(['SYSTEM', 'SUPPORT', 'ADMIN', 'SUPERVISOR']);
+  private static readonly STAFF_ROLES = new Set(['SYSTEM']);
 
   protected isStaffMessage(msg: DisputeMessage): boolean {
     return msg.messageType === 'SYSTEM'

@@ -28,8 +28,6 @@ export const AuthStore = signalStore(
     role:       computed(() => user()?.role ?? storedRole() ?? null),
     isBuyer:    computed(() => (user()?.role ?? storedRole()) === 'BUYER'),
     isSeller:   computed(() => (user()?.role ?? storedRole()) === 'SELLER'),
-    isSupport:  computed(() => ['ADMIN', 'SUPPORT', 'SUPERVISOR'].includes(user()?.role ?? storedRole() ?? '')),
-    isAdmin:    computed(() => (user()?.role ?? storedRole()) === 'ADMIN'),
     hasMfa:     computed(() => user()?.mfaEnabled ?? false),
     isVerified: computed(() => user()?.verified   ?? false),
     fullName:   computed(() => user()?.fullName ?? ''),
@@ -81,8 +79,7 @@ export const AuthStore = signalStore(
               const storedRole = user.role ?? loginRole;
               if (storedRole) sessionStorage.setItem(ROLE_KEY, storedRole);
               patchState(store, { user, storedRole, loading: false });
-              const isStaff = ['ADMIN', 'SUPERVISOR', 'SUPPORT'].includes(storedRole ?? '');
-              router.navigate([isStaff ? '/admin' : '/dashboard']);
+              router.navigate(['/dashboard']);
             }),
           );
         }),
@@ -115,8 +112,7 @@ export const AuthStore = signalStore(
                 challengeId: null,
                 loading: false,
               });
-              const isStaff = ['ADMIN', 'SUPERVISOR', 'SUPPORT'].includes(storedRole ?? '');
-              router.navigate([isStaff ? '/admin' : '/dashboard']);
+              router.navigate(['/dashboard']);
             }),
           )
         ),

@@ -3,13 +3,10 @@ import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { NotificationService } from './notification.service';
 import { NotificationStore } from './notification.store';
-import { AuthStore } from '@core/auth/auth.store';
 import { ToastService } from '@core/notification/toast.service';
 import { AppNotificationResponse, NotificationType } from '@shared/models/model';
 import { TimeAgoPipe } from '@shared/pipes/time-ago.pipe';
 import { TuiIcon } from '@taiga-ui/core';
-
-const STAFF_ROLES = new Set(['ADMIN', 'SUPERVISOR', 'SUPPORT']);
 
 @Component({
   selector: 'app-notifications',
@@ -126,7 +123,6 @@ const STAFF_ROLES = new Set(['ADMIN', 'SUPERVISOR', 'SUPPORT']);
 export class NotificationsComponent implements OnInit {
   private readonly svc       = inject(NotificationService);
   private readonly notifStore = inject(NotificationStore);
-  private readonly auth      = inject(AuthStore);
   private readonly router    = inject(Router);
   private readonly toast     = inject(ToastService);
   private readonly translate = inject(TranslateService);
@@ -146,7 +142,7 @@ export class NotificationsComponent implements OnInit {
   }
 
   protected backRoute() {
-    return STAFF_ROLES.has(this.auth.role() ?? '') ? '/admin/dashboard' : '/dashboard';
+    return '/dashboard';
   }
 
   ngOnInit(): void { this.load(); }
@@ -203,9 +199,7 @@ export class NotificationsComponent implements OnInit {
 
   private entityRoute(n: AppNotificationResponse): string[] | null {
     if (!n.entityId) return null;
-    const isStaff = STAFF_ROLES.has(this.auth.role() ?? '');
-
-    if (n.type.startsWith('ESCROW'))  return [isStaff ? '/admin' : '/escrow', ...(isStaff ? [] : [n.entityId])];
+    if (n.type.startsWith('ESCROW'))  return ['/escrow', n.entityId];
     if (n.type.startsWith('PAYOUT'))  return ['/payouts'];
     return null;
   }

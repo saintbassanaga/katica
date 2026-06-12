@@ -7,20 +7,16 @@ import { NotificationStore } from '@features/notifications/notification.store';
 import { SidebarItem } from '@shared/models/model';
 
 const ICON_MAP: Record<string, string> = {
-  home:              '@tui.home',
-  escrow:            '@tui.arrow-left-right',
-  disputes:          '@tui.alert-triangle',
-  wallet:            '@tui.wallet',
-  payouts:           '@tui.arrow-up-right',
-  notifications:     '@tui.bell',
-  profile:           '@tui.user',
-  adminHome:         '@tui.grid',
-  adminDisputes:     '@tui.alert-triangle',
-  adminUsers:        '@tui.users',
-  adminTransactions: '@tui.receipt',
+  home:          '@tui.home',
+  escrow:        '@tui.arrow-left-right',
+  disputes:      '@tui.alert-triangle',
+  wallet:        '@tui.wallet',
+  payouts:       '@tui.arrow-up-right',
+  notifications: '@tui.bell',
+  profile:       '@tui.user',
 };
 
-const USER_ITEMS: SidebarItem[] = [
+const NAV_ITEMS: SidebarItem[] = [
   { key: 'home',          route: '/dashboard'     },
   { key: 'escrow',        route: '/escrow'        },
   { key: 'disputes',      route: '/disputes'      },
@@ -29,17 +25,6 @@ const USER_ITEMS: SidebarItem[] = [
   { key: 'notifications', route: '/notifications' },
   { key: 'profile',       route: '/profile'       },
 ];
-
-const ADMIN_ITEMS: SidebarItem[] = [
-  { key: 'adminHome',         route: '/admin/dashboard'                                    },
-  { key: 'adminDisputes',     route: '/admin/disputes'                                     },
-  { key: 'adminUsers',        route: '/admin/users',        roles: ['ADMIN', 'SUPERVISOR'] },
-  { key: 'adminTransactions', route: '/admin/transactions', roles: ['ADMIN', 'SUPERVISOR'] },
-  { key: 'notifications',     route: '/notifications'                                      },
-  { key: 'profile',           route: '/profile'                                            },
-];
-
-const STAFF_ROLES = new Set(['ADMIN', 'SUPERVISOR', 'SUPPORT']);
 
 @Component({
   selector: 'app-sidebar',
@@ -53,13 +38,13 @@ const STAFF_ROLES = new Set(['ADMIN', 'SUPERVISOR', 'SUPPORT']);
         <img src="/icons/icon-512-transparent.png" alt="Katica" class="w-10 h-10 object-contain shrink-0" />
         <div>
           <div class="text-white text-xl font-extrabold tracking-[-0.02em]">Katica</div>
-          <div class="text-slate-400/50 text-[.6875rem]">{{ isStaff() ? ('nav.adminSubtitle' | translate) : ('nav.subtitle' | translate) }}</div>
+          <div class="text-slate-400/50 text-[.6875rem]">{{ 'nav.subtitle' | translate }}</div>
         </div>
       </div>
 
       <!-- Nav -->
       <nav class="flex-1 overflow-y-auto p-3" [attr.aria-label]="'nav.dashboard' | translate">
-        @for (item of visibleItems(); track item.route) {
+        @for (item of navItems; track item.route) {
           <a [routerLink]="item.route"
              routerLinkActive="nav-active"
              class="flex items-center gap-3 px-3.5 py-[.6875rem] rounded-xl text-slate-400/80 no-underline text-sm font-medium transition-all min-h-[44px] mb-0.5
@@ -91,20 +76,9 @@ export class SidebarComponent implements OnInit {
   protected readonly auth       = inject(AuthStore);
   protected readonly notifStore = inject(NotificationStore);
   protected readonly iconMap    = ICON_MAP;
+  protected readonly navItems   = NAV_ITEMS;
 
   ngOnInit(): void {
     this.notifStore.loadUnreadCount();
-  }
-
-  protected isStaff() {
-    return STAFF_ROLES.has(this.auth.role() ?? '');
-  }
-
-  protected visibleItems() {
-    const role = this.auth.role() ?? '';
-    if (STAFF_ROLES.has(role)) {
-      return ADMIN_ITEMS.filter(i => !i.roles || i.roles.includes(role));
-    }
-    return USER_ITEMS;
   }
 }

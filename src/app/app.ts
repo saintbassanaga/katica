@@ -1,21 +1,18 @@
-import { Component, computed, effect, inject, signal, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { Component, computed, effect, inject } from '@angular/core';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs';
 import { TuiRoot } from '@taiga-ui/core';
-import { AuthStore } from './core/auth/auth.store';
-import { NotificationStore } from './features/notifications/notification.store';
-import { BottomNavComponent } from './shared/components/bottom-nav/bottom-nav.component';
-import { SidebarComponent } from './shared/components/sidebar/sidebar.component';
-import { FabComponent } from './shared/components/fab/fab.component';
-import { OnboardingComponent } from './shared/components/onboarding/onboarding.component';
-
+import { AuthStore } from '@core/auth/auth.store';
+import { NotificationStore } from '@features/notifications/notification.store';
+import { BottomNavComponent } from '@shared/components/bottom-nav/bottom-nav.component';
+import { SidebarComponent } from '@shared/components/sidebar/sidebar.component';
+import { FabComponent } from '@shared/components/fab/fab.component';
 /** Routes where the global nav (sidebar / bottom-nav) is visible. */
-const NAV_ROUTES = ['/dashboard', '/escrow', '/disputes', '/payouts', '/wallet', '/admin', '/profile', '/notifications'];
+const NAV_ROUTES = ['/dashboard', '/escrow', '/disputes', '/payouts', '/wallet', '/profile', '/notifications'];
 
-/** Full-screen routes that suppress the nav (e.g. dispute chat room). */
+/** Full-screen routes that suppress the nav (e.g., dispute chat room). */
 const FULL_SCREEN_PATTERNS = [
   /^\/disputes\/(?!new(?:\/|$))[^/]+/, // /disputes/:id but not /disputes/new
 ];
@@ -23,7 +20,7 @@ const FULL_SCREEN_PATTERNS = [
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, TuiRoot, BottomNavComponent, SidebarComponent, FabComponent, OnboardingComponent],
+  imports: [RouterOutlet, TuiRoot, BottomNavComponent, SidebarComponent, FabComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
@@ -31,29 +28,13 @@ export class App {
   protected readonly auth              = inject(AuthStore);
   private  readonly router             = inject(Router);
   private  readonly bp                 = inject(BreakpointObserver);
-  private  readonly platformId         = inject(PLATFORM_ID);
   private  readonly notificationStore  = inject(NotificationStore);
-
-  private readonly _onboardingDismissed = signal(
-    isPlatformBrowser(this.platformId) && !!localStorage.getItem('katica_onboarded'),
-  );
 
   constructor() {
     effect(() => {
       const userId = this.auth.userId();
-      if (userId) this.notificationStore.connectWs(userId);
+      if (userId) this.notificationStore.connectWs(userId).finally(null);
     });
-  }
-
-  protected readonly showOnboardingOverlay = computed(() =>
-    this.auth.isAuthenticated() && !this._onboardingDismissed(),
-  );
-
-  protected onOnboardingDone() {
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.setItem('katica_onboarded', '1');
-    }
-    this._onboardingDismissed.set(true);
   }
 
   private readonly currentUrl = toSignal(
@@ -69,7 +50,7 @@ export class App {
     { initialValue: true },
   );
 
-  /** True only on main app pages that have the persistent nav. */
+  /** True, only on main app pages that have the persistent nav. */
   protected readonly showNav = computed(() => {
     if (!this.auth.isAuthenticated()) return false;
     const url = this.currentUrl() ?? '';
@@ -77,7 +58,7 @@ export class App {
     return NAV_ROUTES.some(r => url.startsWith(r));
   });
 
-  /** True for authenticated full-screen routes (e.g. dispute chat). */
+  /** True for authenticated full-screen routes (e.g., dispute chat). */
   protected readonly isFullScreen = computed(() => {
     if (!this.auth.isAuthenticated()) return false;
     const url = this.currentUrl() ?? '';
