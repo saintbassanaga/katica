@@ -40,7 +40,9 @@ export class DisputeService extends ApiService {
   }
 
   createDispute(req: CreateDisputeRequest): Observable<DisputeResponse> {
-    return this.http.post<DisputeResponse>(this.url('/api/disputes'), req, this.defaultOptions);
+    const formData = new FormData();
+    formData.append('request', new Blob([JSON.stringify(req)], { type: 'application/json' }));
+    return this.http.post<DisputeResponse>(this.url('/api/disputes'), formData, { withCredentials: true });
   }
 
   /** Submit arbitration fee payment for the authenticated user */
