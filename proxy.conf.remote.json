@@ -4,6 +4,7 @@
     "changeOrigin": true,
     "secure": true,
     "cookieDomainRewrite": "localhost",
+    "headers": { "Origin": "https://web.katica.app" },
     "logLevel": "debug"
   },
   "/api": {
@@ -11,6 +12,7 @@
     "changeOrigin": true,
     "secure": true,
     "cookieDomainRewrite": "localhost",
+    "headers": { "Origin": "https://web.katica.app" },
     "logLevel": "debug"
   },
   "/ws": {
@@ -19,6 +21,7 @@
     "secure": true,
     "ws": true,
     "cookieDomainRewrite": "localhost",
+    "headers": { "Origin": "https://web.katica.app" },
     "logLevel": "debug"
   }
 }
