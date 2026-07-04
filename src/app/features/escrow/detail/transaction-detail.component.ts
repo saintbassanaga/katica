@@ -11,7 +11,7 @@ import { AmountPipe } from '@shared/pipes/amount.pipe';
 import { StatusBadgeComponent } from '@shared/components/status-badge/status-badge.component';
 import { LoadingSkeletonComponent } from '@shared/components/loading-skeleton/loading-skeleton.component';
 import { StompSubscription } from '@stomp/stompjs';
-import { Milestone, TransactionDetail } from '@shared/models/model';
+import { TransactionDetail } from '@shared/models/model';
 import {
   escrowKeys,
   injectAcceptEscrowMutation,
@@ -638,9 +638,9 @@ export class TransactionDetailComponent {
           );
         }
         // Full refetch to hydrate all fields (platformFee, netAmount, activeDisputeId, …)
-        this.queryClient.invalidateQueries({ queryKey: escrowKeys.detail(txId) });
+        this.queryClient.invalidateQueries({ queryKey: escrowKeys.detail(txId) }).finally();
         // Keep the list in sync so status chips reflect the change immediately
-        this.queryClient.invalidateQueries({ queryKey: escrowKeys.lists() });
+        this.queryClient.invalidateQueries({ queryKey: escrowKeys.lists() }).finally();
         this.toast.success(
           this.translate.instant('escrow.detail.liveUpdate', { status: update.status }),
         );
@@ -674,7 +674,7 @@ export class TransactionDetailComponent {
   }
 
   protected openDispute(id: string): void {
-    this.router.navigate(['/disputes/new'], { queryParams: { transactionId: id } });
+    this.router.navigate(['/disputes/new'], { queryParams: { transactionId: id } }).finally();
   }
 
   protected deliverMilestone(txId: string, milestoneId: string): void {

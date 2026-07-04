@@ -10,7 +10,7 @@ import { ButtonSize, ButtonVariant } from '@shared/models/model';
       [disabled]="disabled() || loading()"
       (click)="clicked.emit($event)"
       class="inline-flex items-center justify-center gap-2 font-semibold
-             rounded-xl transition-all min-h-[44px] focus-visible:ring-2
+             rounded-xl transition-all min-h-11 focus-visible:ring-2
              focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
       [class]="variantClasses() + ' ' + sizeClasses()"
     >

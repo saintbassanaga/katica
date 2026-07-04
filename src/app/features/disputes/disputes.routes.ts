@@ -1,4 +1,6 @@
-import { Routes } from '@angular/router';
+import { inject } from '@angular/core';
+import { Routes, Router } from '@angular/router';
+import { AuthStore } from '@core/auth/auth.store';
 
 export const DISPUTE_ROUTES: Routes = [
   {
@@ -7,6 +9,11 @@ export const DISPUTE_ROUTES: Routes = [
   },
   {
     path: 'new',
+    canActivate: [() => {
+      const auth = inject(AuthStore);
+      const router = inject(Router);
+      return auth.isSeller() ? router.createUrlTree(['/disputes']) : true;
+    }],
     loadComponent: () => import('./create/dispute-create.component').then(m => m.DisputeCreateComponent),
   },
   {

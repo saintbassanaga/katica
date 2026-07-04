@@ -269,7 +269,7 @@ import { TimelineStep } from '@shared/models/model';
         <div class="bg-dark px-4 py-3 flex items-center gap-3 shrink-0 shadow-[0_2px_12px_rgba(15,23,42,.25)]">
           <a routerLink="/disputes"
              class="w-9 h-9 rounded-[10px] bg-white/10 flex items-center justify-center text-white/80 no-underline shrink-0 transition-colors hover:bg-white/20">
-            <tui-icon icon="@tui.arrow-left" class="w-[18px] h-[18px]"></tui-icon>
+            <tui-icon icon="@tui.arrow-left" class="w-4.5 h-4.5"></tui-icon>
           </a>
           <div class="flex-1 min-w-0">
             @if (dispute()) {
@@ -478,7 +478,6 @@ import { TimelineStep } from '@shared/models/model';
 
                   @if (msg.messageType === 'FILE') {
                     <!-- File attachment bubble -->
-                    @let meta = parseFileContent(msg.content);
                     <div class="max-w-[72%] flex flex-col gap-1"
                          [class.items-end]="isOwnMessage(msg)">
                       @if (!isOwnMessage(msg)) {
@@ -486,7 +485,7 @@ import { TimelineStep } from '@shared/models/model';
                       }
                       <button type="button"
                               (click)="downloadFile(msg)"
-                              [title]="('disputes.evidence.download' | translate) + ' ' + (meta?.name ?? '')"
+                              [title]="('disputes.evidence.download' | translate) + ' ' + (parseFileContent(msg.content)?.name ?? '')"
                               class="flex items-center gap-3 px-3.5 py-2.5 rounded-2xl border transition-all active:scale-[.98] text-left w-full"
                               [class.bg-primary]="isOwnMessage(msg)"
                               [class.border-blue-400]="isOwnMessage(msg)"
@@ -496,15 +495,15 @@ import { TimelineStep } from '@shared/models/model';
                               [class.border-slate-200]="!isOwnMessage(msg)"
                               [class.rounded-bl-md]="!isOwnMessage(msg)"
                               [class.shadow-\[0_1px_4px_rgba(15\,23\,42\,\.08\)\]]="!isOwnMessage(msg)">
-                        <tui-icon [icon]="fileIcon(meta?.mimeType ?? '')" class="w-5 h-5 shrink-0"/>
+                        <tui-icon [icon]="fileIcon(parseFileContent(msg.content)?.mimeType ?? '')" class="w-5 h-5 shrink-0"/>
                         <div class="flex-1 min-w-0">
                           <p class="text-[.8125rem] font-semibold truncate m-0"
                              [class.text-white]="isOwnMessage(msg)"
-                             [class.text-slate-800]="!isOwnMessage(msg)">{{ meta?.name ?? ('disputes.evidence.fileDefault' | translate) }}</p>
+                             [class.text-slate-800]="!isOwnMessage(msg)">{{ parseFileContent(msg.content)?.name ?? ('disputes.evidence.fileDefault' | translate) }}</p>
                           <p class="text-[.6875rem] m-0 mt-0.5"
                              [class.text-white]="isOwnMessage(msg)"
                              [style.opacity]="isOwnMessage(msg) ? '0.7' : null"
-                             [class.text-slate-400]="!isOwnMessage(msg)">{{ formatFileSize(meta?.size ?? 0) }}</p>
+                             [class.text-slate-400]="!isOwnMessage(msg)">{{ formatFileSize(parseFileContent(msg.content)?.size ?? 0) }}</p>
                         </div>
                         <tui-icon icon="@tui.download" class="w-3.5 h-3.5 shrink-0 opacity-60"/>
                       </button>
@@ -895,10 +894,11 @@ export class DisputeChatComponent implements OnInit, OnDestroy {
   protected readonly statusTimeline = computed((): TimelineStep[] => {
     const d = this.dispute();
     const currentIdx = d ? this.statusToIndex(d.status) : 0;
+    const terminal = this.isTerminal();
     return this.TIMELINE_STEPS.map((step, idx) => ({
       key: step.key,
       labelKey: step.labelKey,
-      state: idx < currentIdx ? 'completed' : idx === currentIdx ? 'current' : 'pending',
+      state: (terminal || idx < currentIdx) ? 'completed' : idx === currentIdx ? 'current' : 'pending',
     }));
   });
 
@@ -979,6 +979,7 @@ export class DisputeChatComponent implements OnInit, OnDestroy {
               this.disputeService.getDispute(id).subscribe(d => {
                 this.dispute.set(d);
                 this.startCountdown();
+
               });
               break;
             case 'TYPING':

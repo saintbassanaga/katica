@@ -16,7 +16,7 @@ import { TuiIcon } from '@taiga-ui/core';
         <button
           (click)="ctaClick.emit()"
           class="px-6 py-3 bg-primary text-white rounded-xl font-medium
-                 text-sm hover:bg-primary-dark transition-colors min-h-[44px]"
+                 text-sm hover:bg-primary-dark transition-colors min-h-11"
           style="background:#1B4F8A"
         >
           {{ ctaLabel() }}

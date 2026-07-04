@@ -29,17 +29,17 @@ const ICON_MAP: Record<string, string> = {
   imports: [RouterLink, RouterLinkActive, TuiIcon, TranslatePipe],
   styles: [':host { display: block; }'],
   template: `
-    <nav class="fixed bottom-0 left-0 right-0 z-50 bg-white/[.88] backdrop-blur-[16px] backdrop-saturate-[180%] border-t border-slate-200/80 safe-area-bottom" aria-label="Navigation principale">
-      <div class="flex items-stretch h-[60px]">
+    <nav class="fixed bottom-0 left-0 right-0 z-50 bg-white/88 backdrop-blur-lg backdrop-saturate-180 border-t border-slate-200/80 safe-area-bottom" aria-label="Navigation principale">
+      <div class="flex items-stretch h-15">
         @for (item of navItems; track item.route) {
           <a [routerLink]="item.route"
              routerLinkActive="nav-active"
-             class="flex-1 flex flex-col items-center justify-center gap-[3px] text-slate-400 no-underline transition-colors relative min-h-[44px] hover:text-slate-500 [&.nav-active]:text-primary"
+             class="flex-1 flex flex-col items-center justify-center gap-0.75 text-slate-400 no-underline transition-colors relative min-h-11 hover:text-slate-500 [&.nav-active]:text-primary"
              [attr.aria-label]="'nav.' + item.key | translate">
-            <div class="nav-icon w-9 h-7 flex items-center justify-center rounded-[10px] transition-colors [.nav-active_&]:bg-primary/10 relative">
+            <div class="nav-icon w-9 h-7 flex items-center justify-center rounded-[10px] transition-colors in-[.nav-active]:bg-primary/10 relative">
               <tui-icon [icon]="iconMap[item.key]" class="w-5 h-5" />
               @if (item.key === 'notifications' && notifStore.unreadCount() > 0) {
-                <span class="absolute -top-1 -right-1 min-w-[14px] h-[14px] px-0.5 rounded-full bg-primary text-white text-[9px] font-bold flex items-center justify-center leading-none">
+                <span class="absolute -top-1 -right-1 min-w-3.5 h-3.5 px-0.5 rounded-full bg-primary text-white text-[9px] font-bold flex items-center justify-center leading-none">
                   {{ notifStore.unreadCount() > 99 ? '99+' : notifStore.unreadCount() }}
                 </span>
               }
