@@ -1,0 +1,24 @@
+{
+  "/bff": {
+    "target": "https://api.katica.app",
+    "changeOrigin": true,
+    "secure": true,
+    "cookieDomainRewrite": "localhost",
+    "logLevel": "debug"
+  },
+  "/api": {
+    "target": "https://api.katica.app",
+    "changeOrigin": true,
+    "secure": true,
+    "cookieDomainRewrite": "localhost",
+    "logLevel": "debug"
+  },
+  "/ws": {
+    "target": "https://api.katica.app",
+    "changeOrigin": true,
+    "secure": true,
+    "ws": true,
+    "cookieDomainRewrite": "localhost",
+    "logLevel": "debug"
+  }
+}
