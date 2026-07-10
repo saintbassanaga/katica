@@ -1,15 +1,21 @@
 import {Component, computed, inject, OnInit, signal} from '@angular/core';
 import {forkJoin, catchError, of} from 'rxjs';
-import {HttpClient} from '@angular/common/http';
 import {Router, RouterLink} from '@angular/router';
 import {DatePipe} from '@angular/common';
 import {AuthStore} from '@core/auth/auth.store';
 import {AmountPipe} from '@shared/pipes/amount.pipe';
 import {StatusBadgeComponent} from '@shared/components/status-badge/status-badge.component';
-import {environment} from '@env/environment';
 import {TranslatePipe} from '@ngx-translate/core';
 import {LangSwitcherComponent} from '@shared/components/lang-switcher/lang-switcher.component';
-import { DashboardTransactionSummary, DisputeSummary, WalletInfo } from '@shared/models/model';
+import {EscrowService} from '@features/escrow/escrow.service';
+import {DisputeService} from '@features/disputes/dispute.service';
+import {PayoutService} from '@features/payouts/payout.service';
+import {DisputeResponse, TransactionSummary} from '@shared/models/model';
+
+/** Statuses where escrow funds are held (locked in the platform, not yet released to the seller). */
+const HELD_STATUSES = ['LOCKED', 'SHIPPED', 'DELIVERED'];
+/** Statuses where a buyer's money has actually left their pocket (held or already paid out). */
+const SPENT_STATUSES = ['LOCKED', 'SHIPPED', 'DELIVERED', 'RELEASED', 'DISPUTED'];
 
 @Component({
   selector: 'app-dashboard',
@@ -522,31 +528,17 @@ import { DashboardTransactionSummary, DisputeSummary, WalletInfo } from '@shared
         <div class="animate-entry grid grid-cols-2 gap-3 mb-5">
           <div class="bg-white border border-slate-200 rounded-2xl px-4 py-4 shadow-[0_1px_3px_rgba(15,23,42,.05)]">
             <div class="flex items-start justify-between mb-3">
-              <div class="w-9 h-9 rounded-xl bg-[#EBF4FF] text-primary flex items-center justify-center shrink-0">
+              <div class="w-9 h-9 rounded-xl bg-[#FFFBEB] text-amber-600 flex items-center justify-center shrink-0">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                      stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="1" y="4" width="22" height="16" rx="2"/>
-                  <line x1="1" y1="10" x2="23" y2="10"/>
+                  <line x1="12" y1="19" x2="12" y2="5"/>
+                  <polyline points="5 12 12 5 19 12"/>
                 </svg>
               </div>
-              @if (wallet()) {
-                <span
-                  class="text-[.625rem] font-semibold px-1.5 py-0.5 rounded-full bg-success-lt text-success whitespace-nowrap">{{ 'dashboard.kpi.available' | translate }}</span>
-              }
             </div>
-            <div class="text-[.75rem] text-slate-500 font-medium mb-1">{{ 'dashboard.balance' | translate }}</div>
-            <div class="text-xl font-extrabold text-dark tracking-[-0.02em] leading-none">
-              @if (wallet()) {
-                {{ wallet()!.amount | amount }}
-              } @else {
-                —
-              }
-            </div>
-            @if (wallet()?.frozen) {
-              <div
-                class="text-[.6875rem] text-slate-400 mt-1">{{ 'dashboard.kpi.frozen' | translate }} {{ wallet()!.frozen | amount }}
-              </div>
-            }
+            <div class="text-[.75rem] text-slate-500 font-medium mb-1">{{ 'dashboard.kpi.totalSpent' | translate }}</div>
+            <div class="text-xl font-extrabold text-dark tracking-[-0.02em] leading-none">{{ totalSpent() | amount }}</div>
+            <div class="text-[.6875rem] text-slate-400 mt-1">{{ 'dashboard.kpi.asBuyer' | translate }}</div>
           </div>
 
           <div class="bg-white border border-slate-200 rounded-2xl px-4 py-4 shadow-[0_1px_3px_rgba(15,23,42,.05)]">
@@ -554,16 +546,18 @@ import { DashboardTransactionSummary, DisputeSummary, WalletInfo } from '@shared
               <div class="w-9 h-9 rounded-xl bg-success-lt text-success flex items-center justify-center shrink-0">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                      stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/>
+                  <line x1="12" y1="5" x2="12" y2="19"/>
+                  <polyline points="19 12 12 19 5 12"/>
                 </svg>
               </div>
-              <span
-                class="text-[.625rem] font-semibold px-1.5 py-0.5 rounded-full bg-success-lt text-success whitespace-nowrap">{{ 'status.IN_PROGRESS' | translate }}</span>
+              @if (toReceiveCount() > 0) {
+                <span
+                  class="text-[.625rem] font-semibold px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 whitespace-nowrap">{{ 'dashboard.kpi.pending' | translate }}</span>
+              }
             </div>
-            <div class="text-[.75rem] text-slate-500 font-medium mb-1">{{ 'nav.escrow' | translate }}</div>
-            <div class="text-xl font-extrabold text-dark tracking-[-0.02em] leading-none">{{ transactionTotal() }}
-            </div>
-            <div class="text-[.6875rem] text-slate-400 mt-1">{{ 'dashboard.kpi.active' | translate }}</div>
+            <div class="text-[.75rem] text-slate-500 font-medium mb-1">{{ 'dashboard.kpi.toReceive' | translate }}</div>
+            <div class="text-xl font-extrabold text-dark tracking-[-0.02em] leading-none">{{ toReceive() | amount }}</div>
+            <div class="text-[.6875rem] text-slate-400 mt-1">{{ 'dashboard.kpi.asSeller' | translate }}</div>
           </div>
 
           <div class="bg-white border border-slate-200 rounded-2xl px-4 py-4 shadow-[0_1px_3px_rgba(15,23,42,.05)]">
@@ -588,23 +582,31 @@ import { DashboardTransactionSummary, DisputeSummary, WalletInfo } from '@shared
 
           <div class="bg-white border border-slate-200 rounded-2xl px-4 py-4 shadow-[0_1px_3px_rgba(15,23,42,.05)]">
             <div class="flex items-start justify-between mb-3">
-              <div class="w-9 h-9 rounded-xl bg-[#FFFBEB] text-amber-600 flex items-center justify-center shrink-0">
+              <div class="w-9 h-9 rounded-xl bg-[#EBF4FF] text-primary flex items-center justify-center shrink-0">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                      stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="10"/>
-                  <polyline points="12 6 12 12 16 14"/>
+                  <rect x="1" y="4" width="22" height="16" rx="2"/>
+                  <line x1="1" y1="10" x2="23" y2="10"/>
                 </svg>
               </div>
-              <span
-                class="text-[.625rem] font-semibold px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 whitespace-nowrap">{{ 'dashboard.kpi.pending' | translate }}</span>
+              @if (wallet()) {
+                <span
+                  class="text-[.625rem] font-semibold px-1.5 py-0.5 rounded-full bg-success-lt text-success whitespace-nowrap">{{ 'dashboard.kpi.available' | translate }}</span>
+              }
             </div>
-            <div class="text-[.75rem] text-slate-500 font-medium mb-1">{{ 'dashboard.kpi.toReceive' | translate }}</div>
-            <div
-              class="text-xl font-extrabold text-dark tracking-[-0.02em] leading-none">{{ pendingAmount() | amount }}
+            <div class="text-[.75rem] text-slate-500 font-medium mb-1">{{ 'dashboard.balance' | translate }}</div>
+            <div class="text-xl font-extrabold text-dark tracking-[-0.02em] leading-none">
+              @if (wallet()) {
+                {{ wallet()!.balance | amount }}
+              } @else {
+                —
+              }
             </div>
-            <div
-              class="text-[.6875rem] text-slate-400 mt-1">{{ 'dashboard.kpi.txCount' | translate:{count: transactionTotal()} }}
-            </div>
+            @if (wallet()?.frozenAmount) {
+              <div
+                class="text-[.6875rem] text-slate-400 mt-1">{{ 'dashboard.kpi.frozen' | translate }} {{ wallet()!.frozenAmount | amount }}
+              </div>
+            }
           </div>
         </div>
 
@@ -625,7 +627,7 @@ import { DashboardTransactionSummary, DisputeSummary, WalletInfo } from '@shared
               <div class="skeleton-shimmer rounded w-16 h-3"></div>
             </div>
           }
-        } @else if (transactionTotal() === 0) {
+        } @else if (transactions().length === 0) {
           <div class="text-center py-10">
             <div class="w-12 h-12 rounded-[14px] bg-slate-100 flex items-center justify-center mx-auto mb-3">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.75"
@@ -701,26 +703,17 @@ import { DashboardTransactionSummary, DisputeSummary, WalletInfo } from '@shared
         <div class="animate-entry d-kpi-grid">
           <div class="d-kpi-card">
             <div class="d-kpi-top">
-              <div class="d-kpi-icon d-kpi-icon--blue">
+              <div class="d-kpi-icon d-kpi-icon--amber">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                      stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="1" y="4" width="22" height="16" rx="2"/>
-                  <line x1="1" y1="10" x2="23" y2="10"/>
+                  <line x1="12" y1="19" x2="12" y2="5"/>
+                  <polyline points="5 12 12 5 19 12"/>
                 </svg>
               </div>
-              @if (wallet()) {
-                <span class="d-kpi-trend d-kpi-trend--up">{{ 'dashboard.kpi.available' | translate }}</span>
-              }
             </div>
-            <div class="d-kpi-label">{{ 'dashboard.balance' | translate }}</div>
-            <div class="d-kpi-value">@if (wallet()) {
-              {{ wallet()!.amount | amount }}
-            } @else {
-              —
-            }</div>
-            @if (wallet()?.frozen) {
-              <div class="d-kpi-sub">{{ 'dashboard.kpi.frozen' | translate }} {{ wallet()!.frozen | amount }}</div>
-            }
+            <div class="d-kpi-label">{{ 'dashboard.kpi.totalSpent' | translate }}</div>
+            <div class="d-kpi-value">{{ totalSpent() | amount }}</div>
+            <div class="d-kpi-sub">{{ 'dashboard.kpi.asBuyer' | translate }}</div>
           </div>
 
           <div class="d-kpi-card">
@@ -728,14 +721,17 @@ import { DashboardTransactionSummary, DisputeSummary, WalletInfo } from '@shared
               <div class="d-kpi-icon d-kpi-icon--green">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                      stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/>
+                  <line x1="12" y1="5" x2="12" y2="19"/>
+                  <polyline points="19 12 12 19 5 12"/>
                 </svg>
               </div>
-              <span class="d-kpi-trend d-kpi-trend--up">{{ 'status.IN_PROGRESS' | translate }}</span>
+              @if (toReceiveCount() > 0) {
+                <span class="d-kpi-trend d-kpi-trend--warn">{{ 'dashboard.kpi.pending' | translate }}</span>
+              }
             </div>
-            <div class="d-kpi-label">{{ 'dashboard.kpi.activeTransactions' | translate }}</div>
-            <div class="d-kpi-value">{{ transactionTotal() }}</div>
-            <div class="d-kpi-sub">{{ 'dashboard.kpi.lockedOrShipped' | translate }}</div>
+            <div class="d-kpi-label">{{ 'dashboard.kpi.amountToReceive' | translate }}</div>
+            <div class="d-kpi-value">{{ toReceive() | amount }}</div>
+            <div class="d-kpi-sub">{{ 'dashboard.kpi.asSeller' | translate }}</div>
           </div>
 
           <div class="d-kpi-card">
@@ -759,19 +755,26 @@ import { DashboardTransactionSummary, DisputeSummary, WalletInfo } from '@shared
 
           <div class="d-kpi-card">
             <div class="d-kpi-top">
-              <div class="d-kpi-icon d-kpi-icon--amber">
+              <div class="d-kpi-icon d-kpi-icon--blue">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                      stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="10"/>
-                  <polyline points="12 6 12 12 16 14"/>
+                  <rect x="1" y="4" width="22" height="16" rx="2"/>
+                  <line x1="1" y1="10" x2="23" y2="10"/>
                 </svg>
               </div>
-              <span class="d-kpi-trend d-kpi-trend--warn">{{ 'dashboard.kpi.pending' | translate }}</span>
+              @if (wallet()) {
+                <span class="d-kpi-trend d-kpi-trend--up">{{ 'dashboard.kpi.available' | translate }}</span>
+              }
             </div>
-            <div class="d-kpi-label">{{ 'dashboard.kpi.amountToReceive' | translate }}</div>
-            <div class="d-kpi-value">{{ pendingAmount() | amount }}</div>
-            <div class="d-kpi-sub">{{ 'dashboard.kpi.onNTransactions' | translate:{count: transactionTotal()} }}
-            </div>
+            <div class="d-kpi-label">{{ 'dashboard.balance' | translate }}</div>
+            <div class="d-kpi-value">@if (wallet()) {
+              {{ wallet()!.balance | amount }}
+            } @else {
+              —
+            }</div>
+            @if (wallet()?.frozenAmount) {
+              <div class="d-kpi-sub">{{ 'dashboard.kpi.frozen' | translate }} {{ wallet()!.frozenAmount | amount }}</div>
+            }
           </div>
         </div>
 
@@ -795,7 +798,7 @@ import { DashboardTransactionSummary, DisputeSummary, WalletInfo } from '@shared
                   <div class="sk skeleton-shimmer" style="width:70px;height:12px"></div>
                 </div>
               }
-            } @else if (transactionTotal() === 0) {
+            } @else if (transactions().length === 0) {
               <div class="d-empty">
                 <div class="d-empty-icon">
                   <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"
@@ -926,38 +929,51 @@ import { DashboardTransactionSummary, DisputeSummary, WalletInfo } from '@shared
 })
 export class DashboardComponent implements OnInit {
   protected readonly auth = inject(AuthStore);
-  private readonly http = inject(HttpClient);
   protected readonly router = inject(Router);
+  private readonly escrowSvc  = inject(EscrowService);
+  private readonly disputeSvc = inject(DisputeService);
+  private readonly payoutSvc  = inject(PayoutService);
 
   protected readonly today = new Date();
   protected readonly loading = signal(true);
-  protected readonly transactions = signal<DashboardTransactionSummary[]>([]);
-  protected readonly transactionTotal = signal(0);
-  protected readonly disputes = signal<DisputeSummary[]>([]);
+  protected readonly transactions = signal<TransactionSummary[]>([]);
+  protected readonly disputes = signal<DisputeResponse[]>([]);
   protected readonly disputeTotal = signal(0);
-  protected readonly wallet = signal<WalletInfo | null>(null);
+  protected readonly wallet = signal<{ balance: number; frozenAmount: number; currency: string } | null>(null);
 
-  protected readonly pendingAmount = computed(() =>
-    this.transactions().reduce((sum, tx) => sum + (tx.netAmount ?? 0), 0));
+  /** Sum spent as buyer — funds currently held in escrow or already paid out. */
+  protected readonly totalSpent = computed(() => {
+    const uid = this.auth.userId();
+    return this.transactions()
+      .filter(tx => tx.buyerId === uid && SPENT_STATUSES.includes(tx.status))
+      .reduce((sum, tx) => sum + (tx.grossAmount ?? 0), 0);
+  });
+
+  /** Sum owed as seller — funds held in escrow, not yet released. */
+  protected readonly toReceive = computed(() => {
+    const uid = this.auth.userId();
+    return this.transactions()
+      .filter(tx => tx.sellerId === uid && HELD_STATUSES.includes(tx.status))
+      .reduce((sum, tx) => sum + (tx.netAmount ?? 0), 0);
+  });
+
+  protected readonly toReceiveCount = computed(() => {
+    const uid = this.auth.userId();
+    return this.transactions()
+      .filter(tx => tx.sellerId === uid && HELD_STATUSES.includes(tx.status))
+      .length;
+  });
 
   ngOnInit(): void {
     forkJoin({
-      transactions: this.http.get<{ content: DashboardTransactionSummary[]; totalElements: number }>(
-        `${environment.apiUrl}/api/escrow?status=LOCKED,SHIPPED,INITIATED,RELEASED&page=0&size=5`,
-        {withCredentials: true},
-      ),
-      disputes: this.http.get<{ content: DisputeSummary[]; totalElements: number }>(
-        `${environment.apiUrl}/api/disputes?page=0&size=5`,
-        {withCredentials: true},
-      ),
-      wallet: this.http.get<WalletInfo>(
-        `${environment.apiUrl}/api/wallet`,
-        {withCredentials: true},
-      ).pipe(catchError(() => of(null))),
+      // Fetch a broad window of transactions so the spent/to-receive totals below
+      // aren't skewed by pagination — there is no dedicated aggregate endpoint yet.
+      transactions: this.escrowSvc.getTransactions({size: 100}),
+      disputes: this.disputeSvc.getDisputes({size: 5}),
+      wallet: this.payoutSvc.getBalance().pipe(catchError(() => of(null))),
     }).subscribe({
       next: ({transactions, disputes, wallet}) => {
         this.transactions.set(transactions?.content ?? []);
-        this.transactionTotal.set(transactions?.totalElements ?? transactions?.content?.length ?? 0);
         this.disputes.set(disputes?.content ?? []);
         this.disputeTotal.set(disputes?.totalElements ?? disputes?.content?.length ?? 0);
         this.wallet.set(wallet);

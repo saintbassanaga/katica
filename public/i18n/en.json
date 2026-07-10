@@ -150,7 +150,10 @@
       "activeDisputes": "Active disputes",
       "openPending": "Open and pending",
       "amountToReceive": "Amount to receive",
-      "onNTransactions": "Over {{count}} tx"
+      "onNTransactions": "Over {{count}} tx",
+      "totalSpent": "Total spent",
+      "asBuyer": "As buyer",
+      "asSeller": "As seller"
     },
     "table": {
       "date": "Date",

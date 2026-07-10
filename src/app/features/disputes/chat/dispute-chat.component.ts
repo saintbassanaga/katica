@@ -943,7 +943,13 @@ export class DisputeChatComponent implements OnInit, OnDestroy {
     try {
       const detail = await firstValueFrom(this.disputeService.getDispute(id));
       this.dispute.set(detail);
-      this.messages.set(detail.messages ?? []);
+
+      // The dedicated messages endpoint is the source of truth — the dispute
+      // detail's embedded `messages` field can be stripped once a dispute is closed.
+      const messages = await firstValueFrom(this.disputeService.getMessages(id))
+        .catch(() => detail.messages ?? []);
+      this.messages.set(messages);
+
       setTimeout(() => this.scrollToBottom(), 100);
       this.startCountdown();
     } catch {

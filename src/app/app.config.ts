@@ -67,7 +67,7 @@ export const appConfig: ApplicationConfig = {
       }),
     ),
     provideTranslateService({fallbackLang: 'en'}),
-    ...provideTranslateHttpLoader({prefix: '/i18n/', useHttpBackend: true}),
+    ...provideTranslateHttpLoader({prefix: '/i18n/', useHttpBackend: true, enforceLoading: true}),
     provideAppInitializer(async () => {
       const translate = inject(TranslateService);
       const authStore = inject(AuthStore);
