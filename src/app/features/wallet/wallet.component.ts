@@ -57,43 +57,46 @@ const TYPE_ICONS: Record<MovementType, string> = {
   template: `
     <div class="animate-fade">
     <!-- ── Hero ─────────────────────────────────────── -->
-    <div class="relative overflow-hidden bg-dark px-6 pt-11 pb-8">
+    <div class="relative overflow-hidden bg-dark px-6 md:px-8 pt-11 pb-8">
       <div class="absolute rounded-full pointer-events-none blur-[72px] w-65 h-65 -top-20 -right-15 bg-[radial-gradient(circle,rgba(201,146,13,.22)_0%,transparent_70%)] orb-1"></div>
       <div class="absolute rounded-full pointer-events-none blur-[72px] w-50 h-50 -bottom-12.5 -left-12.5 bg-[radial-gradient(circle,rgba(27,79,138,.25)_0%,transparent_70%)] orb-2"></div>
 
-      <p class="text-[.6875rem] font-bold tracking-[.14em] uppercase text-white/38 mb-4">{{ 'wallet.balance' | translate }}</p>
+      <div class="relative max-w-2xl mx-auto w-full">
+        <p class="text-[.6875rem] font-bold tracking-[.14em] uppercase text-white/38 mb-4">{{ 'wallet.balance' | translate }}</p>
 
-      <div class="flex items-start justify-between gap-2 mb-2.5">
-        @if (balanceVisible()) {
-          <div class="text-[clamp(2rem,8vw,3rem)] font-extrabold tracking-[-0.04em] leading-none text-white">{{ wallet()?.balance | amount }}</div>
-        } @else {
-          <div class="text-[clamp(2rem,8vw,3rem)] font-extrabold tracking-[.08em] leading-none text-white/45">••••••</div>
-        }
-        <button class="shrink-0 w-9 h-9 rounded-[10px] bg-white/[.07] border border-white/10 text-white/45 cursor-pointer flex items-center justify-center mt-1 transition-colors hover:bg-white/12 hover:text-white/75" (click)="balanceVisible.set(!balanceVisible())">
-          <tui-icon [icon]="balanceVisible() ? '@tui.eye-off' : '@tui.eye'" class="w-4 h-4" />
-        </button>
-      </div>
-
-      @if (+( wallet()?.frozenAmount ?? 0) > 0) {
-        <div class="inline-flex items-center gap-1.25 bg-[rgba(201,146,13,.1)] border border-[rgba(201,146,13,.28)] rounded-full px-3 py-1 mb-6 text-xs font-semibold text-[#D4A330]">
-          <tui-icon icon="@tui.lock" class="w-3.5 h-3.5" /> {{ 'wallet.frozen' | translate }}: {{ wallet()?.frozenAmount | amount }}
+        <div class="flex items-start justify-between gap-2 mb-2.5">
+          @if (balanceVisible()) {
+            <div class="text-[clamp(2rem,8vw,3.5rem)] font-extrabold tracking-[-0.04em] leading-none text-white">{{ wallet()?.balance | amount }}</div>
+          } @else {
+            <div class="text-[clamp(2rem,8vw,3.5rem)] font-extrabold tracking-[.08em] leading-none text-white/45">••••••</div>
+          }
+          <button class="shrink-0 w-9 h-9 rounded-[10px] bg-white/[.07] border border-white/10 text-white/45 cursor-pointer flex items-center justify-center mt-1 transition-colors hover:bg-white/12 hover:text-white/75" (click)="balanceVisible.set(!balanceVisible())">
+            <tui-icon [icon]="balanceVisible() ? '@tui.eye-off' : '@tui.eye'" class="w-4 h-4" />
+          </button>
         </div>
-      }
 
-      <div class="grid grid-cols-2 gap-2.5">
-        <a routerLink="/payouts/new"
-           class="py-3.25 rounded-xl bg-primary border-none text-white text-sm font-bold font-[inherit] cursor-pointer text-center no-underline block transition-opacity hover:opacity-[.88]">
-          {{ 'wallet.withdrawBtn' | translate }}
-        </a>
-        <button class="py-3.25 rounded-xl bg-white/[.07] border border-white/10 text-white/55 text-sm font-semibold font-[inherit] cursor-pointer transition-colors hover:bg-white/12 hover:text-white/80"
-                (click)="refresh()">
-          {{ 'wallet.refreshBtn' | translate }}
-        </button>
+        @if (+( wallet()?.frozenAmount ?? 0) > 0) {
+          <div class="inline-flex items-center gap-1.25 bg-[rgba(201,146,13,.1)] border border-[rgba(201,146,13,.28)] rounded-full px-3 py-1 mb-6 text-xs font-semibold text-[#D4A330]">
+            <tui-icon icon="@tui.lock" class="w-3.5 h-3.5" /> {{ 'wallet.frozen' | translate }}: {{ wallet()?.frozenAmount | amount }}
+          </div>
+        }
+
+        <div class="grid grid-cols-2 md:w-80 gap-2.5">
+          <a routerLink="/payouts/new"
+             class="py-3.25 rounded-xl bg-primary border-none text-white text-sm font-bold font-[inherit] cursor-pointer text-center no-underline block transition-opacity hover:opacity-[.88]">
+            {{ 'wallet.withdrawBtn' | translate }}
+          </a>
+          <button class="py-3.25 rounded-xl bg-white/[.07] border border-white/10 text-white/55 text-sm font-semibold font-[inherit] cursor-pointer transition-colors hover:bg-white/12 hover:text-white/80"
+                  (click)="refresh()">
+            {{ 'wallet.refreshBtn' | translate }}
+          </button>
+        </div>
       </div>
     </div>
 
     <!-- ── Movements ─────────────────────────────────── -->
-    <div class="animate-entry px-4 pb-24 bg-page min-h-[50vh]">
+    <div class="animate-entry px-4 md:px-8 pb-24 md:pb-8 bg-page min-h-[50vh]">
+      <div class="max-w-2xl mx-auto w-full">
 
       <h2 class="pt-5 pb-3.5 text-[.9375rem] font-bold text-slate-800">{{ 'wallet.history' | translate }}</h2>
 
@@ -110,7 +113,7 @@ const TYPE_ICONS: Record<MovementType, string> = {
       </div>
 
       @if (loading()) {
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2 md:grid md:grid-cols-2 md:gap-3">
           @for (i of skeletons; track i) {
             <div class="h-16 rounded-[14px] skeleton-shimmer"></div>
           }
@@ -124,7 +127,7 @@ const TYPE_ICONS: Record<MovementType, string> = {
         </div>
 
       } @else {
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2 md:grid md:grid-cols-2 md:gap-3 md:items-start">
           @for (mov of movements(); track mov.id) {
             <button
               class="animate-entry stagger-item w-full flex items-center gap-3.5 bg-white border border-slate-200 rounded-[14px] px-4 py-3.5 cursor-pointer text-left font-[inherit] transition-shadow hover:shadow-[0_2px_12px_rgba(15,34,64,.08)]"
@@ -141,7 +144,7 @@ const TYPE_ICONS: Record<MovementType, string> = {
 
               <div class="flex-1 min-w-0">
                 <p class="text-sm font-semibold text-slate-800 whitespace-nowrap overflow-hidden text-ellipsis m-0">{{ mov.description }}</p>
-                <p class="text-[.6875rem] text-slate-400 mt-0.5 m-0">{{ mov.relatedTransactionId ?? '—' }} · {{ mov.createdAt | date:'dd/MM/yy' }} · {{ mov.createdAt | timeAgo }}</p>
+                <p class="text-[.6875rem] text-slate-400 mt-0.5 m-0 truncate">{{ mov.relatedTransactionId ?? '—' }} · {{ mov.createdAt | date:'dd/MM/yy' }} · {{ mov.createdAt | timeAgo }}</p>
               </div>
 
               <p class="text-[.9375rem] font-extrabold shrink-0 tracking-[-0.01em] m-0"
@@ -151,16 +154,17 @@ const TYPE_ICONS: Record<MovementType, string> = {
               </p>
             </button>
           }
-
-          @if (hasMore()) {
-            <button class="w-full py-3.5 border-[1.5px] border-dashed border-slate-200 rounded-xl text-slate-400 text-sm bg-transparent cursor-pointer font-[inherit] transition-colors hover:border-primary hover:text-primary disabled:opacity-50"
-                    (click)="loadMore()" [disabled]="loadingMore()">
-              {{ loadingMore() ? ('common.loading' | translate) : ('common.loadMore' | translate) }}
-            </button>
-          }
         </div>
+
+        @if (hasMore()) {
+          <button class="w-full py-3.5 mt-2 border-[1.5px] border-dashed border-slate-200 rounded-xl text-slate-400 text-sm bg-transparent cursor-pointer font-[inherit] transition-colors hover:border-primary hover:text-primary disabled:opacity-50"
+                  (click)="loadMore()" [disabled]="loadingMore()">
+            {{ loadingMore() ? ('common.loading' | translate) : ('common.loadMore' | translate) }}
+          </button>
+        }
       }
 
+      </div>
     </div>
 
     </div><!-- end animate-fade wrapper -->
