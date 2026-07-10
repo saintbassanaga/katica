@@ -22,6 +22,7 @@ export function injectBalanceQuery() {
   return injectQuery(() => ({
     queryKey: payoutKeys.balance(),
     queryFn: () => firstValueFrom(service.getBalance()),
+    refetchOnMount: 'always',
   }));
 }
 

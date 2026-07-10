@@ -30,6 +30,7 @@ export function injectEscrowListInfiniteQuery(status: () => string) {
     initialPageParam: 0,
     getNextPageParam: (lastPage) =>
       lastPage.last ? undefined : lastPage.page + 1,
+    refetchOnMount: 'always',
   }));
 }
 
@@ -39,6 +40,7 @@ export function injectEscrowDetailQuery(id: () => string) {
     queryKey: escrowKeys.detail(id()),
     queryFn:  () => firstValueFrom(service.getTransaction(id())),
     enabled:  !!id(),
+    refetchOnMount: 'always',
   }));
 }
 

@@ -30,6 +30,7 @@ export function injectDisputeListQuery(params: {
   return injectQuery(() => ({
     queryKey: disputeKeys.list(params),
     queryFn: () => firstValueFrom(service.getDisputes(params)),
+    refetchOnMount: 'always',
   }));
 }
 
@@ -39,6 +40,7 @@ export function injectDisputeDetailQuery(id: () => string) {
     queryKey: disputeKeys.detail(id()),
     queryFn: () => firstValueFrom(service.getDispute(id())),
     enabled: !!id(),
+    refetchOnMount: 'always',
   }));
 }
 
@@ -48,6 +50,7 @@ export function injectDisputeMessagesQuery(id: () => string) {
     queryKey: disputeKeys.messages(id()),
     queryFn: () => firstValueFrom(service.getMessages(id())),
     enabled: !!id(),
+    refetchOnMount: 'always',
   }));
 }
 

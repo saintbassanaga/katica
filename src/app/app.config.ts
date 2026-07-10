@@ -72,13 +72,19 @@ export const appConfig: ApplicationConfig = {
       const translate = inject(TranslateService);
       const authStore = inject(AuthStore);
       const platformId = inject(PLATFORM_ID);
+      const isBrowser = isPlatformBrowser(platformId);
 
-      if (!isPlatformBrowser(platformId)) {
+      // Load translations on both server and browser so SSR/prerendered
+      // HTML already contains real text instead of raw translation keys.
+      const saved = isBrowser
+        ? (localStorage.getItem('katica_lang') as 'fr' | 'en') || 'fr'
+        : 'fr';
+      await firstValueFrom(translate.use(saved));
+
+      if (!isBrowser) {
         return;
       }
 
-      const saved = (localStorage.getItem('katica_lang') as 'fr' | 'en') || 'fr';
-      await firstValueFrom(translate.use(saved));
       return await authStore.init();
     }), provideClientHydration(),
   ],

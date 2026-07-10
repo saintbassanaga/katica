@@ -43,7 +43,7 @@ import { TuiIcon } from '@taiga-ui/core';
                 <div class="absolute bottom-[-30px] left-[-20px] w-[120px] h-[120px] rounded-full pointer-events-none"
                      style="background:radial-gradient(circle,rgba(27,79,138,.4) 0%,transparent 70%)"></div>
                 <div class="relative flex items-center gap-3 mb-6">
-                  <img src="/icons/icon-512-transparent.png" alt="Katica" class="w-10 h-10 object-contain" />
+                  <img src="/icons/katica-icon-light.png" alt="Katica" class="w-10 h-10 object-contain" />
                   <span class="text-white text-2xl font-extrabold tracking-[-0.03em]">Katica</span>
                 </div>
                 <h2 class="text-white text-[1.625rem] font-extrabold tracking-[-0.03em] leading-[1.2] m-0 mb-2">

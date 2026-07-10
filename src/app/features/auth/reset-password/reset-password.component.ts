@@ -31,10 +31,7 @@ function passwordsMatch(c: AbstractControl): ValidationErrors | null {
 
         <!-- Brand -->
         <div class="flex items-center gap-3 mb-8">
-          <div class="w-[42px] h-[42px] bg-gradient-to-br from-gold to-gold-dk rounded-xl flex items-center justify-center shadow-[0_4px_16px_rgba(201,146,13,.35)] shrink-0">
-            <tui-icon icon="@tui.arrow-left" class="w-5 h-5" />
-          </div>
-          <span class="text-[1.125rem] font-extrabold text-dark tracking-[-0.02em]">Katica</span>
+          <img src="/icons/katica-icon.png" alt="Katica" class="w-[42px] h-[42px] rounded-xl shadow-[0_4px_16px_rgba(15,34,64,.25)] shrink-0 object-contain" />
         </div>
 
         <!-- Step indicators -->
