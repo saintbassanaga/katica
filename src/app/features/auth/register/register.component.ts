@@ -459,7 +459,6 @@ function passwordsMatch(c: AbstractControl): ValidationErrors | null {
             <div class="field-wrap">
               <label class="field-label">
                 {{ 'auth.register.email' | translate }}
-                <span class="optional">{{ 'common.optional' | translate }}</span>
               </label>
               <input type="email" formControlName="email"
                      [placeholder]="'auth.register.emailPh' | translate"
@@ -562,7 +561,7 @@ export class RegisterComponent {
     firstName:       ['', [Validators.required, Validators.minLength(2)]],
     lastName:        ['', [Validators.required, Validators.minLength(2)]],
     phone:           ['', Validators.required],
-    email:           ['', Validators.email],
+    email:           ['', [Validators.required, Validators.email]],
     role:            ['BUYER', Validators.required],
     password:        ['', [Validators.required, Validators.minLength(6)]],
     confirmPassword: ['', Validators.required],
@@ -588,7 +587,7 @@ export class RegisterComponent {
       fullName: `${v.firstName!} ${v.lastName!}`.trim(),
       phoneNumber: phone,
       password,
-      email: v.email || undefined,
+      email: v.email!,
       role: v.role as 'BUYER' | 'SELLER',
     }).subscribe({
       next: () => {

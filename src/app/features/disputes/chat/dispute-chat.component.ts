@@ -298,7 +298,7 @@ import { TimelineStep } from '@shared/models/model';
         <!-- AWAITING_ARBITRATION_PAYMENT -->
         @if (dispute()?.status === 'AWAITING_ARBITRATION_PAYMENT') {
           <div
-            class="shrink-0 mx-3 mt-3 bg-white rounded-2xl shadow-sm border-l-4 border-l-orange-400 overflow-hidden animate-fade">
+            class="shrink-0 mx-3 mt-3 bg-white rounded-2xl shadow-sm overflow-hidden animate-fade">
             <div class="px-4 py-3.5">
               <div class="flex items-start gap-3 mb-3">
                 <div class="w-9 h-9 rounded-[10px] shrink-0 flex items-center justify-center bg-orange-50">
@@ -383,7 +383,7 @@ import { TimelineStep } from '@shared/models/model';
         <!-- REFERRED_TO_ARBITRATION -->
         @if (dispute()?.status === 'REFERRED_TO_ARBITRATION') {
           <div
-            class="shrink-0 mx-3 mt-3 bg-white rounded-2xl shadow-sm border-l-4 border-l-violet-500 overflow-hidden animate-fade">
+            class="shrink-0 mx-3 mt-3 bg-white rounded-2xl shadow-sm overflow-hidden animate-fade">
             <div class="px-4 py-3.5">
               <div class="flex items-start gap-3 mb-2">
                 <div class="w-9 h-9 rounded-[10px] shrink-0 flex items-center justify-center bg-violet-50">

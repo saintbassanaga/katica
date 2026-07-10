@@ -86,8 +86,7 @@ const RESOLVED_STATUSES = new Set([
             @for (dispute of filtered(); track dispute.id) {
               <a
                 [routerLink]="['/disputes', dispute.id]"
-                class="animate-entry stagger-item flex items-center gap-3.5 bg-white rounded-2xl px-4 py-3.5 no-underline shadow-[0_1px_4px_rgba(15,23,42,.06)] transition-all hover:shadow-[0_4px_16px_rgba(15,23,42,.1)] hover:-translate-y-px border-l-4"
-                [class]="statusBorderClass(dispute.status)"
+                class="animate-entry stagger-item flex items-center gap-3.5 bg-white rounded-2xl px-4 py-3.5 no-underline shadow-[0_1px_4px_rgba(15,23,42,.06)] transition-all hover:shadow-[0_4px_16px_rgba(15,23,42,.1)] hover:-translate-y-px"
               >
                 <!-- Icon -->
                 <div class="w-11 h-11 rounded-[14px] shrink-0 flex items-center justify-center"
@@ -163,22 +162,6 @@ export class DisputeListComponent implements OnInit {
       },
       error: () => { this.loading.set(false); this.loadingMore.set(false); },
     });
-  }
-
-  protected statusBorderClass(status: string): string {
-    const map: Record<string, string> = {
-      OPENED: 'border-l-error',
-      UNDER_REVIEW: 'border-l-indigo-400',
-      AWAITING_BUYER: 'border-l-amber-400',
-      AWAITING_SELLER: 'border-l-amber-400',
-      AWAITING_ARBITRATION_PAYMENT: 'border-l-orange-400',
-      REFERRED_TO_ARBITRATION: 'border-l-violet-400',
-      RESOLVED_BUYER: 'border-l-success',
-      RESOLVED_SELLER: 'border-l-success',
-      RESOLVED_SPLIT: 'border-l-teal-400',
-      CLOSED_NO_ACTION: 'border-l-slate-300',
-    };
-    return map[status] ?? 'border-l-slate-200';
   }
 
   protected statusIconBg(status: string): string {

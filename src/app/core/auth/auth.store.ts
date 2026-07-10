@@ -79,6 +79,7 @@ export const AuthStore = signalStore(
               const storedRole = user.role ?? loginRole;
               if (storedRole) sessionStorage.setItem(ROLE_KEY, storedRole);
               patchState(store, { user, storedRole, loading: false });
+              toast.success(translate.instant('toast.loginSuccess'));
               router.navigate(['/dashboard']);
             }),
           );
@@ -112,6 +113,7 @@ export const AuthStore = signalStore(
                 challengeId: null,
                 loading: false,
               });
+              toast.success(translate.instant('toast.loginSuccess'));
               router.navigate(['/dashboard']);
             }),
           )

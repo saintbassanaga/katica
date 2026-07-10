@@ -127,9 +127,7 @@ const TYPE_ICONS: Record<MovementType, string> = {
         <div class="flex flex-col gap-2">
           @for (mov of movements(); track mov.id) {
             <button
-              class="animate-entry stagger-item w-full flex items-center gap-3.5 bg-white border border-slate-200 border-l-[3px] rounded-[14px] px-4 py-3.5 cursor-pointer text-left font-[inherit] transition-shadow hover:shadow-[0_2px_12px_rgba(15,34,64,.08)]"
-              [class.border-l-success]="isCredit(mov)"
-              [class.border-l-error]="!isCredit(mov)"
+              class="animate-entry stagger-item w-full flex items-center gap-3.5 bg-white border border-slate-200 rounded-[14px] px-4 py-3.5 cursor-pointer text-left font-[inherit] transition-shadow hover:shadow-[0_2px_12px_rgba(15,34,64,.08)]"
               (click)="selectedMovement.set(mov); sheetOpen.set(true)"
             >
               <div

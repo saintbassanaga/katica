@@ -9,6 +9,7 @@ import { NotificationStore } from '@features/notifications/notification.store';
 import { BottomNavComponent } from '@shared/components/bottom-nav/bottom-nav.component';
 import { SidebarComponent } from '@shared/components/sidebar/sidebar.component';
 import { FabComponent } from '@shared/components/fab/fab.component';
+import { ToastContainerComponent } from '@shared/components/toast/toast-container.component';
 /** Routes where the global nav (sidebar / bottom-nav) is visible. */
 const NAV_ROUTES = ['/dashboard', '/escrow', '/disputes', '/payouts', '/wallet', '/profile', '/notifications'];
 
@@ -20,7 +21,7 @@ const FULL_SCREEN_PATTERNS = [
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, TuiRoot, BottomNavComponent, SidebarComponent, FabComponent],
+  imports: [RouterOutlet, TuiRoot, BottomNavComponent, SidebarComponent, FabComponent, ToastContainerComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

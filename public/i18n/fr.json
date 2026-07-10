@@ -59,7 +59,7 @@
       "phone": "Téléphone",
       "email": "Email",
       "emailPh": "jean@exemple.cm",
-      "emailError": "Adresse email invalide",
+      "emailError": "Email valide requis",
       "role": "Je suis",
       "buyer": "Acheteur",
       "seller": "Vendeur",
@@ -684,6 +684,7 @@
     }
   },
   "toast": {
+    "loginSuccess": "Connexion réussie.",
     "loginError": "Numéro de téléphone ou mot de passe incorrect.",
     "mfaError": "Code MFA invalide. Réessayez.",
     "profileUpdated": "Profil mis à jour avec succès.",

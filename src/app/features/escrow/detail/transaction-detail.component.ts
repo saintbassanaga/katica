@@ -415,8 +415,7 @@ const STATUS_ORDER: Record<string, number> = {
 
           <!-- Action: accept transaction (PENDING_ACCEPTANCE → buyer) -->
           @if (isBuyer(tx) && tx.status === 'PENDING_ACCEPTANCE') {
-            <div class="bg-white rounded-2xl p-4 shadow-sm border-l-4"
-                 style="border-left-color: var(--clr-gold)">
+            <div class="bg-white rounded-2xl p-4 shadow-sm">
               <h2 class="text-sm font-semibold mb-0.5" style="color: var(--clr-text)">
                 {{ 'escrow.detail.acceptSection.title' | translate }}
               </h2>
