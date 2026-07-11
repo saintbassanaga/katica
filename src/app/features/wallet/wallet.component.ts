@@ -53,7 +53,7 @@ const TYPE_ICONS: Record<MovementType, string> = {
   selector: 'app-wallet',
   standalone: true,
   imports: [RouterLink, DatePipe, AmountPipe, TimeAgoPipe, BottomSheetComponent, TranslatePipe, TuiIcon],
-  styles: [':host { display: block; }'],
+  styles: [':host { display: block; height: 100%; overflow-y: auto; }'],
   template: `
     <div class="animate-fade">
     <!-- ── Hero ─────────────────────────────────────── -->
@@ -95,22 +95,29 @@ const TYPE_ICONS: Record<MovementType, string> = {
     </div>
 
     <!-- ── Movements ─────────────────────────────────── -->
-    <div class="animate-entry px-4 md:px-8 pb-24 md:pb-8 bg-page min-h-[50vh]">
-      <div class="max-w-2xl mx-auto w-full">
+    <div class="bg-page min-h-[50vh]">
 
-      <h2 class="pt-5 pb-3.5 text-[.9375rem] font-bold text-slate-800">{{ 'wallet.history' | translate }}</h2>
+      <!-- Sticky section header: title + filters -->
+      <div class="sticky top-0 z-20 bg-page/95 backdrop-blur-sm px-4 md:px-8 pt-5 pb-3.5 shadow-[0_1px_0_rgba(15,23,42,.06)]">
+        <div class="max-w-2xl mx-auto w-full">
+          <h2 class="pb-3.5 text-[.9375rem] font-bold text-slate-800">{{ 'wallet.history' | translate }}</h2>
 
-      <div class="flex gap-2 overflow-x-auto pb-3.5 scrollbar-hide">
-        @for (f of typeFilters; track f.types) {
-          <button
-            class="shrink-0 px-4 py-1.25 rounded-full text-[.8125rem] font-semibold cursor-pointer border-[1.5px] font-[inherit] transition-all whitespace-nowrap"
-            [class]="activeTypeFilter() === f.types
-              ? 'bg-primary border-primary text-white'
-              : 'bg-white border-slate-200 text-slate-500'"
-            (click)="setTypeFilter(f.types)"
-          >{{ f.labelKey | translate }}</button>
-        }
+          <div class="flex gap-2 overflow-x-auto scrollbar-hide">
+            @for (f of typeFilters; track f.types) {
+              <button
+                class="shrink-0 px-4 py-1.25 rounded-full text-[.8125rem] font-semibold cursor-pointer border-[1.5px] font-[inherit] transition-all whitespace-nowrap"
+                [class]="activeTypeFilter() === f.types
+                  ? 'bg-primary border-primary text-white'
+                  : 'bg-white border-slate-200 text-slate-500'"
+                (click)="setTypeFilter(f.types)"
+              >{{ f.labelKey | translate }}</button>
+            }
+          </div>
+        </div>
       </div>
+
+      <div class="animate-entry px-4 md:px-8 pb-24 md:pb-8">
+        <div class="max-w-2xl mx-auto w-full">
 
       @if (loading()) {
         <div class="flex flex-col gap-2 md:grid md:grid-cols-2 md:gap-3">
@@ -164,6 +171,7 @@ const TYPE_ICONS: Record<MovementType, string> = {
         }
       }
 
+        </div>
       </div>
     </div>
 

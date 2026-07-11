@@ -20,24 +20,33 @@ const FILTERS = [
   selector: 'app-transaction-list',
   standalone: true,
   imports: [RouterLink, AmountPipe, StatusBadgeComponent, LoadingSkeletonComponent, EmptyStateComponent, TimeAgoPipe, TranslatePipe],
+  styles: [':host { display: block; height: 100%; overflow-y: auto; }'],
   template: `
-    <div class="animate-fade px-4 py-6 pb-24 max-w-lg mx-auto">
-      <h1 class="text-xl font-bold text-gray-900 mb-4">{{ 'escrow.title' | translate }}</h1>
+    <div class="animate-fade">
 
-      <!-- Filter chips -->
-      <div class="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
-        @for (filter of filters; track filter.key) {
-          <button
-            (click)="setFilter(filter.status)"
-            class="shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors border"
-            [style.background]="activeFilter() === filter.status ? 'var(--clr-primary)' : 'var(--clr-surface)'"
-            [style.color]="activeFilter() === filter.status ? '#fff' : 'var(--clr-muted)'"
-            [style.border-color]="activeFilter() === filter.status ? 'var(--clr-primary)' : 'var(--clr-border)'"
-          >
-            {{ filter.key | translate }}
-          </button>
-        }
+      <!-- Sticky section header: title + filters -->
+      <div class="sticky top-0 z-20 bg-page/95 backdrop-blur-sm px-4 pt-6 pb-2 shadow-[0_1px_0_rgba(15,23,42,.06)]">
+        <div class="max-w-lg mx-auto w-full">
+          <h1 class="text-xl font-bold text-gray-900 mb-4">{{ 'escrow.title' | translate }}</h1>
+
+          <!-- Filter chips -->
+          <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+            @for (filter of filters; track filter.key) {
+              <button
+                (click)="setFilter(filter.status)"
+                class="shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors border"
+                [style.background]="activeFilter() === filter.status ? 'var(--clr-primary)' : 'var(--clr-surface)'"
+                [style.color]="activeFilter() === filter.status ? '#fff' : 'var(--clr-muted)'"
+                [style.border-color]="activeFilter() === filter.status ? 'var(--clr-primary)' : 'var(--clr-border)'"
+              >
+                {{ filter.key | translate }}
+              </button>
+            }
+          </div>
+        </div>
       </div>
+
+      <div class="px-4 py-4 pb-24 max-w-lg mx-auto">
 
       @if (query.isPending()) {
         <app-loading-skeleton [count]="3" />
@@ -97,6 +106,7 @@ const FILTERS = [
           </button>
         }
       }
+      </div>
     </div>
   `,
 })

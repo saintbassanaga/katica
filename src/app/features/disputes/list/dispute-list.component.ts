@@ -27,31 +27,35 @@ const RESOLVED_STATUSES = new Set([
   template: `
     <div class="animate-fade flex flex-col min-h-full bg-page">
 
-      <!-- Topbar -->
-      <div class="sticky top-0 z-20 bg-dark shadow-[0_2px_12px_rgba(15,23,42,.25)] px-4 md:px-8 py-3 flex items-center gap-3">
-        <a routerLink="/dashboard"
-           class="w-9 h-9 rounded-[10px] bg-white/10 flex items-center justify-center text-white/80 no-underline shrink-0 transition-colors hover:bg-white/20">
-          <tui-icon icon="@tui.arrow-left" class="w-[18px] h-[18px]" />
-        </a>
-        <div class="flex-1 min-w-0">
-          <h1 class="text-sm font-bold text-white m-0">{{ 'disputes.title' | translate }}</h1>
-          @if (!loading()) {
-            <p class="text-xs text-white/50 m-0">{{ 'disputes.count' | translate:{ count: filtered().length } }}</p>
+      <!-- Sticky header: topbar + filters -->
+      <div class="sticky top-0 z-20">
+
+        <!-- Topbar -->
+        <div class="bg-dark shadow-[0_2px_12px_rgba(15,23,42,.25)] px-4 md:px-8 py-3 flex items-center gap-3">
+          <a routerLink="/dashboard"
+             class="w-9 h-9 rounded-[10px] bg-white/10 flex items-center justify-center text-white/80 no-underline shrink-0 transition-colors hover:bg-white/20">
+            <tui-icon icon="@tui.arrow-left" class="w-[18px] h-[18px]" />
+          </a>
+          <div class="flex-1 min-w-0">
+            <h1 class="text-sm font-bold text-white m-0">{{ 'disputes.title' | translate }}</h1>
+            @if (!loading()) {
+              <p class="text-xs text-white/50 m-0">{{ 'disputes.count' | translate:{ count: filtered().length } }}</p>
+            }
+          </div>
+        </div>
+
+        <!-- Filter chips -->
+        <div class="bg-page px-4 md:px-8 pt-3 pb-1 flex gap-1.5 overflow-x-auto scrollbar-hide shrink-0 shadow-[0_1px_0_rgba(15,23,42,.06)]">
+          @for (f of filters; track f.value) {
+            <button
+              (click)="setFilter(f.value)"
+              class="shrink-0 px-3 py-1.5 rounded-lg text-[11px] font-semibold border transition-all whitespace-nowrap"
+              [class]="activeFilter() === f.value
+                ? 'bg-primary text-white border-primary'
+                : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'"
+            >{{ f.labelKey | translate }}</button>
           }
         </div>
-      </div>
-
-      <!-- Filter chips -->
-      <div class="px-4 md:px-8 pt-3 pb-1 flex gap-1.5 overflow-x-auto scrollbar-hide shrink-0">
-        @for (f of filters; track f.value) {
-          <button
-            (click)="setFilter(f.value)"
-            class="shrink-0 px-3 py-1.5 rounded-lg text-[11px] font-semibold border transition-all whitespace-nowrap"
-            [class]="activeFilter() === f.value
-              ? 'bg-primary text-white border-primary'
-              : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'"
-          >{{ f.labelKey | translate }}</button>
-        }
       </div>
 
       <!-- Content -->
